@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentMatch - Resume Distribution</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body, table, td {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .email-wrapper {
+            width: 100%;
+            background-color: #f5f5f5;
+            padding: 20px 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #191c40;
+            padding: 40px 30px 30px;
+            text-align: center;
+        }
+
+        .header-accent {
+            height: 3px;
+            background-color: #b29758;
+            width: 100%;
+        }
+
+        .logo {
+            margin-bottom: 15px;
+        }
+
+        .logo h1 {
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            color: #c3c0c0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 0;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .success-badge {
+            background-color: #5c5f7c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .greeting h2 {
+            color: #191c40;
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+        }
+
+        .greeting p {
+            color: #5c5f7c;
+            font-size: 16px;
+            margin: 0 0 30px 0;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            background-color: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-left: 3px solid #b29758;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card h3 {
+            color: #191c40;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+        }
+
+        .info-item {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            display: table-cell;
+            color: #5c5f7c;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            width: 40%;
+        }
+
+        .info-value {
+            display: table-cell;
+            color: #191c40;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .highlight-value {
+            background-color: #b29758;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .main-message {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid #b29758;
+            border-radius: 6px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .main-message p {
+            color: #404472;
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: #404472;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .footer {
+            background-color: #191c40;
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .footer h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #ffffff;
+        }
+
+        .footer p {
+            color: #c3c0c0;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .footer-links {
+            margin: 20px 0;
+        }
+
+        .footer-links a {
+            color: #b29758;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12px;
+            margin: 0 12px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #5c5f7c;
+            margin: 20px 0;
+        }
+
+        @media screen and (max-width: 600px) {
+            .email-container {
+                margin: 0 10px;
+                border-radius: 4px;
+            }
+
+            .header, .content, .footer {
+                padding: 25px 20px;
+            }
+
+            .greeting h2 {
+                font-size: 20px;
+            }
+
+            .footer-links a {
+                display: block;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-wrapper">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td>
+                <div class="email-container">
+                    <!-- Header Accent -->
+                    <div class="header-accent"></div>
+
+                    <!-- Header -->
+                    <div class="header">
+                        <div class="logo">
+                            <h1>TalentMatch</h1>
+                        </div>
+                        <p class="header-subtitle">Professional Recruitment Platform</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="content">
+                        <!-- Success Badge -->
+                        <div class="success-badge">
+                            ✓ Distribution Completed
+                        </div>
+
+                        <!-- Personal Greeting -->
+                        <div class="greeting">
+                            <h2>Dear {{firstName}} {{lastName}},</h2>
+                            <p>Your resume has been successfully processed and distributed to our network of specialized recruitment partners.</p>
+                        </div>
+
+                        <!-- Information Card -->
+                        <div class="info-card">
+                            <h3>Distribution Summary</h3>
+                            <div class="info-item">
+                                <div class="info-label">Profession</div>
+                                <div class="info-value">{{profession}}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Processing Date</div>
+                                <div class="info-value">
+                                    <span class="highlight-value">{date&time}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Message -->
+                        <div class="main-message">
+                            <p>Your professional profile has been matched and distributed to <strong>specialized recruitment agencies</strong> within our network. These agencies have been carefully selected based on your experience and career objectives. Should they identify suitable opportunities that align with your profile, they will contact you directly.</p>
+                        </div>
+
+                        <!-- CTA Section -->
+                        <div class="cta-section">
+                            <a href="http://localhost:3000" class="cta-button">Explore Opportunities</a>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="footer">
+                        <div class="footer-content">
+                            <h4>TalentMatch</h4>
+                            <p>Connecting professionals with opportunities since 2025</p>
+                        </div>
+
+                        <div class="footer-links">
+                            <a href="#">Privacy Policy</a>
+                            <a href="#">Terms of Service</a>
+                            <a href="#">Contact Support</a>
+                            <a href="#">Unsubscribe</a>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="footer-content">
+                            <p>© 2025 TalentMatch. All rights reserved.</p>
+                            <p>This is an automated message. Please do not reply to this email.</p>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,3004 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לוח בקרה מאובטח - CVGO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #059669;
+            --error: #dc2626;
+            --warning: #d97706;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafbfc;
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: row-reverse;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.98);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-left: 1px solid var(--gray-200);
+            position: relative;
+        }
+
+        .sidebar-header {
+            padding: 32px 24px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .user-info {
+            background: var(--gray-50);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .company-name {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            padding: 24px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 32px;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 24px;
+            margin-bottom: 8px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            position: relative;
+            border-radius: 0;
+        }
+
+        .menu-item:hover {
+            background: rgba(37,99,235,0.08);
+            color: var(--primary);
+        }
+
+        .menu-item.active {
+            background: rgba(37,99,235,0.12);
+            color: var(--primary);
+            font-weight: 600;
+            border-left: 3px solid var(--primary);
+        }
+
+        .menu-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .menu-item.locked::after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            width: 16px;
+            height: 16px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23dc2626'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'/%3E%3C/svg%3E") no-repeat center;
+        }
+
+        .menu-item.requires-approval::after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            width: 16px;
+            height: 16px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d97706'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z'/%3E%3C/svg%3E") no-repeat center;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logout-section {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            padding: 0 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fafbfc;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .greeting {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .current-time {
+            font-size: 14px;
+            color: var(--gray-500);
+            background: var(--gray-50);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Clean Card Design */
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--gray-100);
+            background: white;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .card-content {
+            padding: 32px;
+        }
+
+        /* Home Page - Redesigned for Professional Look */
+        .home-interface {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: right;
+        }
+
+        .welcome-section {
+            margin-bottom: 48px;
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+        }
+
+        .ai-assistant {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+        }
+
+        .ai-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .ai-input {
+            width: 100%;
+            border: 1px solid var(--gray-300);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+        }
+
+        .ai-send-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+        }
+
+        .ai-response {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            color: var(--gray-700);
+            min-height: 50px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .quick-action {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            text-align: right;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .quick-action-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .quick-action-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .quick-action-desc {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        /* Subscription Status */
+        .subscription-status {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.expired {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+        }
+
+        .subscription-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .btn-danger {
+            background: var(--error);
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        /* Pricing Section - Clean */
+        .pricing-intro {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 48px;
+        }
+
+        .pricing-title {
+            font-size: 36px;
+            font-weight: 300;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+        }
+
+        .pricing-subtitle {
+            font-size: 16px;
+            color: var(--gray-600);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            border-width: 2px;
+        }
+
+        .pricing-card.featured::before {
+            content: 'מומלץ';
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pricing-plan-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .pricing-price {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .price-amount {
+            font-size: 42px;
+            font-weight: 300;
+            color: var(--primary);
+        }
+
+        .price-currency {
+            font-size: 18px;
+            color: var(--gray-600);
+        }
+
+        .price-period {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 24px;
+        }
+
+        .pricing-description {
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .subscription-status-pricing {
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success);
+        }
+
+        /* Candidates Section - Simplified */
+        .candidates-container {
+            max-width: 3000px;
+        }
+
+        .feature-section {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .section-description {
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .email-section {
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .email-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+        }
+
+        .current-email {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .email-info {
+            flex: 1;
+        }
+
+        .email-address {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 16px;
+        }
+
+        .email-status {
+            font-size: 13px;
+            color: var(--success);
+            margin-top: 4px;
+        }
+
+        .email-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .no-email-state {
+            text-align: center;
+            padding: 32px;
+            color: var(--gray-600);
+        }
+
+        .no-email-state p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        /* Region Selection */
+        .regions-section {
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: 24px;
+        }
+
+        .regions-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .regions-description {
+            color: var(--gray-600);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .regions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .region-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .region-option:hover {
+            border-color: var(--primary);
+            background: rgba(37,99,235,0.02);
+        }
+
+        .region-option.selected {
+            border-color: var(--primary);
+            background: rgba(37,99,235,0.08);
+            color: var(--primary);
+        }
+
+        .region-option input[type="checkbox"] {
+            margin: 0;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        /* Access Denied - Redesigned */
+        .access-denied {
+            max-width: 600px;
+            margin: 48px auto;
+            text-align: center;
+            padding: 48px;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-md);
+        }
+
+        .access-denied-icon {
+            color: var(--primary);
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+        }
+
+        .access-denied h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+        }
+
+        .access-denied p {
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+
+        .feature-info {
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-top: 32px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .feature-info {
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            margin-top: 32px;
+        }
+
+        /* Alert System */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(100%);
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        @keyframes slideIn {
+            to { transform: translateX(0); }
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .toast.success .toast-icon {
+            background: var(--success);
+        }
+
+        .toast.error .toast-icon {
+            background: var(--error);
+        }
+
+        .toast.warning .toast-icon {
+            background: var(--warning);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-message {
+            font-weight: 500;
+            color: var(--gray-900);
+            font-size: 14px;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+        }
+
+        .toast-close:hover {
+            color: var(--gray-600);
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        .student-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .student-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .blur-text {
+            filter: blur(4px);
+            user-select: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-400);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--gray-600);
+            background: var(--gray-100);
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .greeting {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+                border-left: none;
+                border-top: 1px solid var(--gray-200);
+                padding-bottom: 60px; /* Space for mobile nav */
+            }
+
+            .nav-menu {
+                display: flex;
+                justify-content: space-around;
+                padding: 12px 0;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                border-top: 1px solid var(--gray-200);
+                z-index: 100;
+            }
+
+            .menu-section {
+                margin-bottom: 0;
+            }
+
+            .menu-title, .logout-section, .sidebar-header .user-info {
+                display: none;
+            }
+
+            .menu-item {
+                flex-direction: column;
+                gap: 4px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .menu-item.active {
+                border-left: none;
+                border-top: 3px solid var(--primary);
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+
+            .greeting {
+                font-size: 20px;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .regions-grid, .pricing-grid, .students-grid, .student-main-info {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+        /* Students Section Styles */
+        .students-container {
+            width: 100%; /* Use full width */
+            max-width: none; /* Remove max-width constraint */
+        }
+
+        .students-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .search-container {
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 24px 16px 50px; /* Add padding for icon */
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--gray-400);
+        }
+
+        .filters-container {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .filters-toggle {
+            background: var(--gray-50);
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 20px 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .filters-toggle:hover {
+            background: var(--gray-100);
+        }
+
+        .filters-content {
+            display: none;
+            padding: 28px;
+            background: white;
+        }
+
+        .filters-content.open {
+            display: block;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .filter-group {
+            background: var(--gray-50);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-200);
+        }
+
+        .gpa-range-filter {
+            background: var(--gray-50);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-200);
+        }
+
+        .gpa-slider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .gpa-slider input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--gray-200);
+            outline: none;
+        }
+
+        .gpa-slider span {
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 35px;
+            text-align: center;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--gray-300);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .students-results {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .results-count {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sort-options label {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .sort-options select {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 13px;
+        }
+
+
+        .student-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .student-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+        }
+
+        .student-info {
+            margin-bottom: 16px;
+        }
+
+        .student-info p {
+            margin: 6px 0;
+            font-size: 14px;
+            color: var(--gray-600);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .student-info strong {
+            color: var(--gray-800);
+        }
+
+        .experience-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .experience-badge.has {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success);
+        }
+
+        .experience-badge.no {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--gray-600);
+        }
+
+        .student-full-details {
+            line-height: 1.6;
+        }
+
+        .student-full-details h4 {
+            color: var(--gray-900);
+            margin: 20px 0 8px 0;
+            font-weight: 600;
+        }
+
+        .student-full-details p {
+            margin: 8px 0;
+            color: var(--gray-700);
+        }
+
+        .blur-text {
+            filter: blur(3px);
+            user-select: none;
+        }
+
+        .sensitive-info {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin: 12px 0;
+            border-left: 3px solid var(--warning);
+        }
+
+        .sensitive-info .blur-text {
+            background: var(--gray-200);
+            color: transparent;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .students-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .student-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .student-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .student-main-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            align-items: start;
+        }
+
+        .student-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .student-card p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .student-info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .student-info-group strong {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+
+        .blurred-placeholder {
+            background: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+            color: transparent;
+            border-radius: 6px;
+            padding: 2px 8px;
+            display: inline-block;
+            min-width: 80px;
+            height: 1.2em;
+            animation: shimmer 1.5s infinite;
+            user-select: none;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <div class="loading-text">טוען נתוני משתמש...</div>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <div class="main-content">
+        <header class="header">
+            <div class="greeting" id="greeting">טוען...</div>
+            <div class="current-time" id="current-time"></div>
+        </header>
+
+        <div class="content-area">
+            <!-- Home Section with AI Assistant -->
+            <div id="home-section" class="content-section active">
+                <div class="home-interface">
+                    <div class="welcome-section">
+                        <h2 class="welcome-title">ברוכים הבאים למערכת CVGO</h2>
+                        <p class="welcome-subtitle">מערכת ניהול גיוס חכמה המשלבת בינה מלאכותית לחוויה מתקדמת.</p>
+
+                        <div class="ai-assistant">
+                            <h3 class="ai-title">🤖 עוזר ה-AI האישי שלכם</h3>
+                            <textarea id="ai-input" class="ai-input" placeholder="שאלו אותי כל דבר על המערכת, החשבון שלכם, או בקשו ממני לבצע פעולות..." rows="4"></textarea>
+                            <button id="ai-send" class="btn ai-send-btn">שלח שאלה</button>
+                            <div id="ai-response" class="ai-response"></div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <div class="quick-action" data-section="candidates">
+                            <div class="quick-action-icon">👥</div>
+                            <div class="quick-action-title">חיפוש מועמדים</div>
+                            <div class="quick-action-desc">מאגר מועמדים מתקדם עם כלי סינון חכמים.</div>
+                        </div>
+                        <div class="quick-action" data-section="jobs">
+                            <div class="quick-action-icon">📋</div>
+                            <div class="quick-action-title">פרסום משרות</div>
+                            <div class="quick-action-desc">פרסום אוטומטי בפלטפורמות מובילות.</div>
+                        </div>
+                        <div class="quick-action" data-section="settings">
+                            <div class="quick-action-icon">⚙️</div>
+                            <div class="quick-action-title">הגדרות</div>
+                            <div class="quick-action-desc">נהלו את הפרופיל והעדפות המערכת.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Pricing Section -->
+            <div id="pricing-section" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">תעריפים ומחירים</h2>
+                    </div>
+                    <div class="card-content">
+                        <p style="color: var(--gray-600); margin-bottom: 32px;">בחרו את החבילה המתאימה לכם. כל שירות מתומחר בנפרד לשקיפות מלאה.</p>
+                    </div>
+                </div>
+
+                <div id="pricing-grid" class="pricing-grid">
+                    <!-- Pricing cards will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Candidates Section - Redesigned -->
+            <div id="candidates-section" class="content-section">
+                <div class="candidates-container">
+                    <!-- Subscription Status -->
+                    <div id="candidates-subscription-status" class="subscription-status">
+                        <div class="status-header">
+                            <div class="status-title">מנוי מועמדים</div>
+                            <div id="candidates-status-badge" class="status-badge active">פעיל</div>
+                        </div>
+                        <div class="subscription-details">
+                            <div class="detail-item">
+                                <div class="detail-label">תוקף עד</div>
+                                <div class="detail-value" id="candidates-expiry">31/12/2025</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">ימים נותרו</div>
+                                <div class="detail-value" id="candidates-days-left">127</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">סטטוס</div>
+                                <div class="detail-value">פעיל</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Management -->
+                    <div class="feature-section">
+                        <h2 class="section-title">קבלת קורות חיים</h2>
+                        <p class="section-description">הגדר כתובת מייל לקבלת קורות חיים מתאימים</p>
+
+                        <div class="email-section">
+                            <div class="email-header">כתובת מייל פעילה</div>
+
+                            <div id="current-email-display" style="display: none;">
+                                <div class="current-email">
+                                    <div class="email-info">
+                                        <div class="email-address" id="display-email"></div>
+                                        <div class="email-status">מקבל קורות חיים באופן אוטומטי</div>
+                                    </div>
+                                    <div class="email-actions">
+                                        <button class="btn btn-small btn-outline" id="change-email-btn">שנה</button>
+                                        <button class="btn btn-small" id="test-email-btn">בדיקה</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="no-email-display" class="no-email-state">
+                                <p>לא הוגדרה כתובת מייל לקבלת קורות חיים</p>
+                                <button class="btn" id="add-email-btn">הוסף כתובת מייל</button>
+                            </div>
+                        </div>
+
+                        <!-- Region Selection -->
+                        <div class="regions-section">
+                            <div class="regions-header">אזורי שירות</div>
+                            <p class="regions-description">בחר באילו אזורים תרצה לקבל מועמדים</p>
+
+                            <div class="regions-grid">
+                                <label class="region-option">
+                                    <input type="checkbox" name="regions" value="north">
+                                    <span>צפון</span>
+                                </label>
+                                <label class="region-option">
+                                    <input type="checkbox" name="regions" value="center">
+                                    <span>מרכז</span>
+                                </label>
+                                <label class="region-option">
+                                    <input type="checkbox" name="regions" value="lowlands">
+                                    <span>שפלה</span>
+                                </label>
+                                <label class="region-option">
+                                    <input type="checkbox" name="regions" value="south">
+                                    <span>דרום</span>
+                                </label>
+                            </div>
+
+                            <button class="btn" id="save-regions-btn">שמור הגדרות</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div id="students-section" class="content-section">
+                <div class="students-container">
+                    <div class="students-header">
+                        <h2 class="section-title">מאגר הסטודנטים</h2>
+                        <p class="section-description">מצא את הכישרון הבא שלך במאגר הסטודנטים שלנו.</p>
+                    </div>
+
+                    <!-- Search and Filters -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" id="student-search-input" placeholder="חיפוש חופשי (שם, מוסד, תחום, מיומנות...)" />
+                        </div>
+                    </div>
+
+                    <div class="filters-container">
+                        <button class="filters-toggle" id="filters-toggle-btn">
+                            ▶ סינון מתקדם
+                        </button>
+                        <div class="filters-content">
+                            <div class="filters-grid">
+                                <div class="filter-group">
+                                    <label>טווח ממוצע ציונים</label>
+                                    <div class="gpa-range-filter">
+                                        <div class="gpa-slider">
+                                            <label for="gpa-min">מ-</label>
+                                            <input type="range" id="gpa-min" min="60" max="100" value="60">
+                                            <span id="gpa-min-value">60</span>
+                                        </div>
+                                        <div class="gpa-slider">
+                                            <label for="gpa-max">עד-</label>
+                                            <input type="range" id="gpa-max" min="60" max="100" value="100">
+                                            <span id="gpa-max-value">100</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="experience-filter">ניסיון בעבודה</label>
+                                    <select id="experience-filter">
+                                        <option value="">הכל</option>
+                                        <option value="true">עם ניסיון</option>
+                                        <option value="false">ללא ניסיון</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="institution-filter">מוסד לימודים</label>
+                                    <select id="institution-filter">
+                                        <option value="">כל המוסדות</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="study-type-filter">תחום לימודים</label>
+                                    <select id="study-type-filter">
+                                        <option value="">כל התחומים</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="education-level-filter">רמת לימודים</label>
+                                    <select id="education-level-filter">
+                                        <option value="">הכל</option>
+                                        <option value="bachelor">תואר ראשון</option>
+                                        <option value="master">תואר שני</option>
+                                        <option value="phd">דוקטורט</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="availability-filter">זמינות</label>
+                                    <select id="availability-filter">
+                                        <option value="">הכל</option>
+                                        <option value="full_time">משרה מלאה</option>
+                                        <option value="part_time">משרה חלקית</option>
+                                        <option value="flexible">גמיש</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="study-year-filter">שנת לימודים</label>
+                                    <select id="study-year-filter">
+                                        <option value="">הכל</option>
+                                        <option value="1">שנה א'</option>
+                                        <option value="2">שנה ב'</option>
+                                        <option value="3">שנה ג'</option>
+                                        <option value="4">שנה ד'</option>
+                                        <option value="graduate">בוגר</option>
+                                        <option value="advanced">מתקדם יותר</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="flexible-hours-filter">שעות גמישות</label>
+                                    <select id="flexible-hours-filter">
+                                        <option value="">הכל</option>
+                                        <option value="true">כן</option>
+                                        <option value="false">לא</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-actions">
+                                <button class="btn btn-outline" id="clear-filters-btn">נקה סינונים</button>
+                                <button class="btn" id="apply-filters-btn">החל סינונים</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="students-results">
+                        <div class="results-header">
+                            <div class="results-count">נמצאו <span id="students-count">0</span> סטודנטים</div>
+                            <div class="sort-options">
+                                <label for="sort-students">מיין לפי:</label>
+                                <select id="sort-students">
+                                    <option value="lastUpdated">עודכן לאחרונה</option>
+                                    <option value="gpa">ממוצע ציונים</option>
+                                    <option value="name">שם</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="students-list" class="students-grid">
+                            <!-- Student cards will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="executives-section" class="content-section">
+                <div id="executives-content">
+                    <div class="feature-card">
+                        <h2 class="feature-title">מאגר בכירים</h2>
+                        <p class="feature-description">מועמדים בכירים לתפקידי ניהול ומנהלים.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="jobs-section" class="content-section">
+                <div id="jobs-content">
+                    <div class="feature-card">
+                        <h2 class="feature-title">פרסום משרות</h2>
+                        <p class="feature-description">פרסמו משרות בפלטפורמות מובילות.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">הגדרות אישיות</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="personal-settings-form">
+                            <div class="form-group">
+                                <label for="fullName">שם מלא</label>
+                                <input type="text" id="fullName" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">מספר טלפון</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <button type="submit" class="btn">שמור שינויים</button>
+                        </form>
+
+                        <hr style="margin: 32px 0; border-color: var(--gray-200);">
+
+                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">שנה כתובת אימייל</h3>
+                        <form id="change-email-form">
+                            <div class="form-group">
+                                <label for="newEmail">אימייל חדש</label>
+                                <input type="email" id="newEmail" name="newEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="currentPassword">סיסמה נוכחית (לאימות)</label>
+                                <input type="password" id="currentPassword" name="currentPassword" required>
+                            </div>
+                            <button type="submit" class="btn">שנה אימייל</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Management Section -->
+            <div id="company-management-section" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">ניהול חברה</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="company-settings-form">
+                            <div class="form-group">
+                                <label for="companyName">שם חברה</label>
+                                <input type="text" id="companyName" name="companyName" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyAddress">כתובת</label>
+                                <input type="text" id="companyAddress" name="address" required>
+                            </div>
+                            <button type="submit" class="btn">שמור שינויים</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="assets/images/logo.jpg" alt="CVGO Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'color: var(--primary); font-weight: 700; font-size: 16px;\'>CV</div>';">
+                </div>
+                <h1>CVGO</h1>
+            </div>
+
+            <div class="user-info">
+                <div class="user-name" id="user-name">טוען...</div>
+                <div class="company-name" id="company-name">טוען...</div>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="menu-section">
+                <div class="menu-title">ראשי</div>
+                <a href="#" class="menu-item active" data-section="home">
+                    <div class="menu-icon">🏠</div>
+                    <span>דף הבית</span>
+                </a>
+                <a href="#" class="menu-item" data-section="pricing">
+                    <div class="menu-icon">💳</div>
+                    <span>תעריפים</span>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">ניהול</div>
+                <a href="#" class="menu-item" data-section="candidates" data-feature="candidates">
+                    <div class="menu-icon">👥</div>
+                    <span>מועמדים</span>
+                </a>
+                <a href="#" class="menu-item" data-section="students" data-feature="students">
+                    <div class="menu-icon">🎓</div>
+                    <span>סטודנטים</span>
+                </a>
+                <a href="#" class="menu-item" data-section="executives" data-feature="executives">
+                    <div class="menu-icon">💼</div>
+                    <span>בכירים</span>
+                </a>
+                <a href="#" class="menu-item" data-section="jobs" data-feature="job-posting">
+                    <div class="menu-icon">📋</div>
+                    <span>פרסום משרות</span>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">הגדרות</div>
+                <a href="#" class="menu-item" data-section="settings">
+                    <div class="menu-icon">⚙️</div>
+                    <span>הגדרות אישיות</span>
+                </a>
+                <a href="#" class="menu-item" id="company-management-link" data-section="company-management" style="display: none;">
+                    <div class="menu-icon">🏢</div>
+                    <span>ניהול חברה</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="logout-section">
+            <a href="#" class="menu-item logout" id="logout-btn">
+                <div class="menu-icon">🚪</div>
+                <span>יציאה</span>
+            </a>
+        </div>
+    </aside>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-overlay" id="email-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">הוספת כתובת מייל</h3>
+            <button class="close-modal" id="close-email-modal-btn">×</button>
+        </div>
+        <form id="email-form">
+            <div class="form-group">
+                <label for="recruitment-email">כתובת מייל</label>
+                <input type="email" id="recruitment-email" name="email" required placeholder="example@company.com">
+            </div>
+            <div class="form-group">
+                <label for="email-description">תיאור (אופציונלי)</label>
+                <input type="text" id="email-description" name="description" placeholder="למשל: מנהל גיוס">
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" class="btn-outline" id="cancel-email-modal-btn">ביטול</button>
+                <button type="submit" class="btn">שמור מייל</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toast-container" class="toast-container"></div>
+
+<script>
+    let currentUser = null;
+    let currentCompany = null;
+    let accessibleFeatures = [];
+    let availableFeatures = {};
+    let isRecruitmentAgency = false;
+    let allStudents = [];
+
+    console.log("                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                        #&&&&%                                               ,((((/                        .#&&#                                                        \n" +
+        "                                                   &&&&&&&&&&&&&&&&&   &&&&&&             @&&&&&        (((((((((((((((((             &&&&&&&&&&&&&&&&                                                  \n" +
+        "                                                &&&&&&&&&@#,@%&&&&&&&&  &&&&&&           %&&&&&.     ((((((((//   ((((((((         &&&&&&&&&@%&@&&&&&&&&&                                               \n" +
+        "                                              ,&&&&&&            #&      &&&&&&          &&&&&.    #((((((            .(         @&&&&&&            &&&&&&*                                             \n" +
+        "                                             .&&&&&&                      &&&&&&        &&&&&%    ((((((                        @&&&&&               ,&&&&&*                                            \n" +
+        "                                             &&&&&&                        &&&&&&      &&&&&@     (((((                         &&&&&&                &&&&&&                                            \n" +
+        "                                             &&&&&%                         &&&&&%    &&&&&@      (((((          ((((((((((((   &&&&&*                &&&&&&                                            \n" +
+        "                                             &&&&&&                          &&&&&@  &&&&&&       (((((#              (((((((   &&&&&&                &&&&&&                                            \n" +
+        "                                              &&&&&&*                         &&&&&%&&&&&&         ((((((           (((((((((    &&&&&&              &&&&&&                                             \n" +
+        "                                               @&&&&&&&         &&&&@          &&&&&&&&&&           ((((((((      (((((  ((((     &&&&&&&@        &&&&&&&&                                              \n" +
+        "                                                 @&&&&&&&&&&&&&&&&&&&           &&&&&&&&               ((((((   (((((     ##        &&&&&&&&&&&&&&&&&&&@                                                \n" +
+        "                                                     @&&&&&&&&&&&                &&&&&&                      ((((((                     &&&&&&&&&&&@                                                    \n" +
+        "                                                                                                          (((((((                                                                                       \n" +
+        "                                                                                                    ,((((((((/                                                                                          \n" +
+        "                                                                                         ((((((((((((((((*                                                                                              \n" +
+        "                                                                                          ./(((((,                                                                                                      \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n" +
+        "                                                                                                                                                                                                        \n")
+
+    // Hoisted helper functions
+    function getAvailabilityText(availability) {
+        switch(availability) {
+            case 'full_time': return 'משרה מלאה';
+            case 'part_time': return 'משרה חלקית';
+            case 'flexible': return 'גמיש';
+            default: return 'לא צוין';
+        }
+    }
+
+    function renderBlurredPlaceholders(text) {
+        if (!text) return '';
+        return text.replace(/&\*{7}&/g, '<span class="blurred-placeholder">&*******&</span>');
+    }
+
+    function getDegreeText(degree) {
+        switch(degree) {
+            case 'bachelor': return 'תואר ראשון';
+            case 'master': return 'תואר שני';
+            case 'phd': return 'דוקטורט';
+            case 'certificate': return 'תעודה';
+            case 'diploma': return 'דיפלומה';
+            default: return 'לא צוין';
+        }
+    }
+
+    // Feature definitions matching the backend
+    const FEATURES = {
+        'candidates': {
+            name: 'חיפוש מועמדים',
+            price: 299,
+            period: 'לחודש',
+            requiresRecruitmentAgency: true,
+            description: 'גישה מלאה למאגר המועמדים'
+        },
+        'students': {
+            name: 'סטודנטים',
+            price: 199,
+            period: 'לחודש',
+            requiresRecruitmentAgency: false,
+            description: 'גישה למאגר הסטודנטים'
+        },
+        'executives': {
+            name: 'בכירים',
+            price: 499,
+            period: 'לחודש',
+            requiresRecruitmentAgency: true,
+            description: 'גישה למאגר הבכירים'
+        },
+        'job-posting': {
+            name: 'פרסום משרות',
+            price: 199,
+            period: 'למשרה',
+            requiresRecruitmentAgency: false,
+            description: 'פרסום משרות בפלטפורמות מובילות'
+        },
+        'full-service': {
+            name: 'שירות מלא',
+            price: 899,
+            period: 'לחודש',
+            requiresRecruitmentAgency: true,
+            description: 'פתרון מקיף לחברות גיוס ומשאבי אנוש'
+        }
+    };
+
+    // Toast Notification System
+    function showAlert(message, type = 'success', duration = 5000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const iconContent = {
+            success: '✓',
+            error: '!',
+            warning: '⚠'
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon">${iconContent[type] || ''}</div>
+            <div class="toast-content">
+                <p class="toast-message">${message}</p>
+            </div>
+            <button class="toast-close">&times;</button>
+        `;
+
+        container.appendChild(toast);
+
+        const closeButton = toast.querySelector('.toast-close');
+        closeButton.addEventListener('click', () => {
+            toast.remove();
+        });
+
+        setTimeout(() => {
+            if (toast) {
+                toast.remove();
+            }
+        }, duration);
+    }
+
+    // Email Modal Functions
+    function openEmailModal() {
+        document.getElementById('email-modal').style.display = 'flex';
+    }
+
+    function closeEmailModal() {
+        document.getElementById('email-modal').style.display = 'none';
+        document.getElementById('email-form').reset();
+    }
+
+    async function checkAuth() {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.log('No token found, redirecting to login');
+            window.location.href = '/';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/user/profile', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 401) {
+                localStorage.removeItem('authToken');
+                showAlert('תקופת ההתחברות פגה. אנא התחבר שוב.', 'error');
+                setTimeout(() => window.location.href = '/', 2000);
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data.success || !data.user) {
+                throw new Error('Invalid response format');
+            }
+
+            currentUser = data.user;
+            currentCompany = data.company;
+
+            await loadFeatureAccessStatus();
+            updateUserInfo();
+            loadUserSettings();
+
+            if (currentUser.position === 'owner' || currentUser.position === 'admin') {
+                const companyLink = document.getElementById('company-management-link');
+                if (companyLink) {
+                    companyLink.style.display = 'flex';
+                }
+            }
+
+            hideLoadingScreen();
+
+        } catch (error) {
+            console.error('Auth check failed:', error);
+            showAlert('שגיאה בטעינת נתוני משתמש.', 'error');
+            setTimeout(() => {
+                localStorage.removeItem('authToken');
+                window.location.href = '/';
+            }, 2000);
+        }
+    }
+
+    async function loadFeatureAccessStatus() {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('/api/features/access-status', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                accessibleFeatures = data.accessibleFeatures || [];
+                availableFeatures = data.availableFeatures || {};
+                isRecruitmentAgency = data.isRecruitmentAgency || false;
+
+                console.log(accessibleFeatures)
+                console.log(response)
+                console.log(availableFeatures)
+                console.log(isRecruitmentAgency)
+                updateMenuItems();
+                renderPricingGrid();
+                loadCandidatesContent();
+                loadStudents(); // Initial load with no filters
+            }
+        } catch (error) {
+            console.error('Failed to load feature access status:', error);
+        }
+    }
+
+    function toggleFilters() {
+        const content = document.querySelector('.filters-content');
+        const toggle = document.querySelector('.filters-toggle');
+
+        content.classList.toggle('open');
+        const icon = content.classList.contains('open') ? '▼' : '▶';
+        toggle.innerHTML = `${icon} סינון מתקדם`;
+    }
+
+    function updateMenuItems() {
+        document.querySelectorAll('[data-feature]').forEach(item => {
+            const featureId = item.dataset.feature;
+            const hasAccess = accessibleFeatures.includes(featureId);
+            const feature = FEATURES[featureId];
+
+            item.classList.remove('locked', 'requires-approval');
+
+            if (!hasAccess) {
+                if (feature && feature.requiresRecruitmentAgency && !isRecruitmentAgency) {
+                    item.classList.add('requires-approval');
+                    item.title = 'דורש אישור חברת השמה';
+                } else {
+                    item.classList.add('locked');
+                    item.title = 'דורש מנוי פעיל';
+                }
+            }
+        });
+    }
+
+    function renderPricingGrid() {
+        const pricingGrid = document.getElementById('pricing-grid');
+        if (!pricingGrid) return;
+
+        pricingGrid.innerHTML = '';
+
+        Object.entries(FEATURES).forEach(([featureId, feature]) => {
+            if (feature.requiresRecruitmentAgency && !isRecruitmentAgency) {
+                return;
+            }
+
+            const hasAccess = accessibleFeatures.includes(featureId);
+
+            const card = document.createElement('div');
+            card.className = `pricing-card ${featureId === 'full-service' ? 'featured' : ''}`;
+
+            card.innerHTML = `
+                <div class="pricing-title">${feature.name}</div>
+                <div class="pricing-price">₪${feature.price}</div>
+                <div style="color: var(--gray-500); margin-bottom: 16px;">${feature.period}</div>
+                <div style="color: var(--gray-600); margin-bottom: 24px;">${feature.description}</div>
+                <div>
+                    ${hasAccess ?
+                '<div class="alert success" style="margin: 0;"><span>✓</span>יש לך גישה לתכונה זו</div>' :
+                '<button class="btn" style="width: 100%;">רכוש עכשיו</button>'
+            }
+                </div>
+            `;
+
+            pricingGrid.appendChild(card);
+        });
+
+        if (!isRecruitmentAgency) {
+            const notice = document.createElement('div');
+            notice.className = 'card';
+            notice.innerHTML = `
+                <div class="card-content">
+                    <h3 style="margin-bottom: 16px;">תכונות מיוחדות לחברות השמה</h3>
+                    <p style="color: var(--gray-600); margin-bottom: 16px;">
+                        תכונות כמו חיפוש מועמדים, בכירים ושירות מלא זמינות רק לחברות השמה מאושרות.
+                    </p>
+                    <div class="alert warning" style="margin: 0;">
+                        <span>⚠</span>
+                        סטטוס חברתכם: ${currentCompany.isRecruitmentAgency ?
+                (currentCompany.isRecruitmentAccess === 'pending' ? 'ממתין לאישור' :
+                    currentCompany.isRecruitmentAccess === 'denied' ? 'נדחה' : 'לא מוגדר') :
+                'לא חברת השמה'
+            }
+                    </div>
+                </div>
+            `;
+            pricingGrid.appendChild(notice);
+        }
+    }
+
+    async function loadCandidatesContent() {
+        if (!accessibleFeatures.includes('candidates')) return;
+
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('/api/recruitment-emails/', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                displayRecruitmentEmail(data.emails[0] || null);
+                loadSupportRegions();
+            }
+        } catch (error) {
+            console.error('Error loading candidates content:', error);
+        }
+    }
+
+    function displayRecruitmentEmail(email) {
+        const currentEmailDisplay = document.getElementById('current-email-display');
+        const noEmailDisplay = document.getElementById('no-email-display');
+        const displayEmailSpan = document.getElementById('display-email');
+
+        if (email && email.isActive) {
+            currentEmailDisplay.style.display = 'block';
+            noEmailDisplay.style.display = 'none';
+            displayEmailSpan.textContent = email.email;
+        } else {
+            currentEmailDisplay.style.display = 'none';
+            noEmailDisplay.style.display = 'block';
+        }
+    }
+
+    async function loadSupportRegions() {
+        if (!currentCompany.supportRegions) return;
+
+        const checkboxes = document.querySelectorAll('input[name="regions"]');
+        checkboxes.forEach(cb => {
+            if (currentCompany.supportRegions.includes(cb.value)) {
+                cb.checked = true;
+                cb.closest('.region-option').classList.add('selected');
+            }
+        });
+    }
+
+    // Navigation
+    function initNavigation() {
+        document.querySelectorAll('.menu-item:not(.logout)').forEach(item => {
+            item.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const section = this.dataset.section;
+                const featureId = this.dataset.feature;
+
+                console.log(featureId);
+                console.log(accessibleFeatures.includes(featureId));
+                console.log(accessibleFeatures)
+
+                if (featureId && !accessibleFeatures.includes(featureId)) {
+                    await showAccessDenied(section, featureId);
+                    return;
+                }
+
+                const currentSection = document.querySelector('.content-section.active');
+                const targetSection = document.getElementById(section + '-section');
+
+                if (currentSection && targetSection && currentSection !== targetSection) {
+                    currentSection.classList.remove('active');
+                    targetSection.classList.add('active');
+                }
+
+                document.querySelectorAll('.menu-item:not(.logout)').forEach(mi => mi.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    }
+
+    async function showAccessDenied(section, featureId) {
+        const feature = FEATURES[featureId];
+        if (!feature) return;
+
+        const targetSection = document.getElementById(section + '-section');
+        if (!targetSection) return;
+
+        const isRecruitmentRequired = feature.requiresRecruitmentAgency && !isRecruitmentAgency;
+
+        const accessDeniedHTML = `
+            <div class="access-denied">
+                <div class="access-denied-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                </div>
+                <h3>גישה מוגבלת</h3>
+                <p>
+                    ${isRecruitmentRequired ?
+            'תכונה זו זמינה רק לחברות השמה מאושרות.' :
+            'תכונה זו דורשת מנוי פעיל.'
+        }
+                </p>
+                ${!isRecruitmentRequired ? `
+                    <div class="feature-info" style="margin-top: 24px;">
+                        <div style="font-size: 32px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">₪${feature.price}</div>
+                        <div style="color: var(--gray-500); margin-bottom: 16px;">${feature.period}</div>
+                        <div style="color: var(--gray-600); margin-bottom: 24px;">${feature.description}</div>
+                        <button class="btn" onclick="goToPricing()">רכוש עכשיו</button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        targetSection.innerHTML = accessDeniedHTML;
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        targetSection.classList.add('active');
+
+        document.querySelectorAll('.menu-item:not(.logout)').forEach(mi => mi.classList.remove('active'));
+        const menuItem = document.querySelector(`[data-section="${section}"]`);
+        if (menuItem) menuItem.classList.add('active');
+    }
+
+    function goToPricing() {
+        document.querySelectorAll('.menu-item:not(.logout)').forEach(mi => mi.classList.remove('active'));
+        document.querySelector('[data-section="pricing"]').classList.add('active');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('pricing-section').classList.add('active');
+    }
+
+    function updateUserInfo() {
+        if (currentUser) {
+            document.getElementById('user-name').textContent = currentUser.fullName;
+            document.getElementById('greeting').textContent = getGreeting();
+        }
+        if (currentCompany) {
+            document.getElementById('company-name').textContent = currentCompany.name;
+        }
+    }
+
+    function getGreeting() {
+        const hour = new Date().getHours();
+        let greeting = '';
+        if (hour >= 5 && hour < 12) greeting = 'בוקר טוב';
+        else if (hour >= 12 && hour < 17) greeting = 'צהריים טובים';
+        else if (hour >= 17 && hour < 21) greeting = 'אחר הצהריים טובים';
+        else greeting = 'לילה טוב';
+
+        return currentUser ? `${greeting}, ${currentUser.fullName}` : greeting;
+    }
+
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleString('he-IL', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('current-time').textContent = timeString;
+    }
+
+    function loadUserSettings() {
+        if (!currentUser || !currentCompany) return;
+
+        document.getElementById('fullName').value = currentUser.fullName || '';
+        document.getElementById('phone').value = currentUser.phone || '';
+        document.getElementById('companyName').value = currentCompany.name || '';
+        document.getElementById('companyAddress').value = currentCompany.address || '';
+    }
+
+    function hideLoadingScreen() {
+        const loader = document.getElementById('loading-screen');
+        if (loader) loader.style.display = 'none';
+
+        const mainContent = document.querySelector('.dashboard-container');
+        if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.visibility = 'visible';
+        }
+    }
+
+    async function logout() {
+        try {
+            const token = localStorage.getItem('authToken');
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (error) {
+            console.error('Logout request failed:', error);
+        } finally {
+            localStorage.removeItem('authToken');
+            window.location.href = '/';
+        }
+    }
+
+    // Email Management Functions
+    async function addRecruitmentEmail(email, description) {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('/api/recruitment-emails/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, description })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                displayRecruitmentEmail(data.email);
+                closeEmailModal();
+                showAlert('כתובת המייל נוספה בהצלחה', 'success');
+            } else {
+                showAlert(data.error || 'שגיאה בהוספת האימייל', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding email:', error);
+            showAlert('שגיאה בהוספת האימייל', 'error');
+        }
+    }
+
+    async function testRecruitmentEmail() {
+        try {
+            const emailDisplay = document.getElementById('display-email').textContent;
+            const token = localStorage.getItem('authToken');
+
+            // Get current email ID (simplified - you may need to store this)
+            const response = await fetch('/api/recruitment-emails/', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const data = await response.json();
+            const currentEmail = data.emails.find(e => e.email === emailDisplay);
+
+            if (!currentEmail) {
+                showAlert('לא נמצאה כתובת מייל', 'error');
+                return;
+            }
+
+            const testResponse = await fetch(`/api/recruitment-emails/test/${currentEmail._id}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const testData = await testResponse.json();
+            if (testData.success) {
+                showAlert('מייל בדיקה נשלח בהצלחה', 'success');
+            } else {
+                showAlert(testData.error || 'שגיאה בשליחת מייל בדיקה', 'error');
+            }
+        } catch (error) {
+            console.error('Error testing email:', error);
+            showAlert('שגיאה בשליחת מייל בדיקה', 'error');
+        }
+    }
+
+    async function updateSupportRegions() {
+        const selectedRegions = Array.from(document.querySelectorAll('input[name="regions"]:checked'))
+            .map(cb => cb.value);
+
+        if (selectedRegions.length === 0) {
+            showAlert('יש לבחור לפחות אזור אחד', 'warning');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('/api/recruitment-emails/regions', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ supportRegions: selectedRegions })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                currentCompany.supportRegions = selectedRegions;
+                showAlert('אזורי השירות עודכנו בהצלחה', 'success');
+            } else {
+                showAlert(data.error || 'שגיאה בעדכון אזורי השירות', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating regions:', error);
+            showAlert('שגיאה בעדכון אזורי השירות', 'error');
+        }
+    }
+
+    // Event Listeners
+    function initializeEventListeners() {
+        document.getElementById('filters-toggle-btn').addEventListener('click', toggleFilters);
+        document.getElementById('close-modal-btn').addEventListener('click', closeStudentModal);
+
+        // Email form
+        document.getElementById('email-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('recruitment-email').value;
+            const description = document.getElementById('email-description').value;
+            addRecruitmentEmail(email, description);
+        });
+
+        // Email buttons
+        document.getElementById('add-email-btn').addEventListener('click', openEmailModal);
+        document.getElementById('change-email-btn').addEventListener('click', openEmailModal);
+        document.getElementById('test-email-btn').addEventListener('click', testRecruitmentEmail);
+        document.getElementById('close-email-modal-btn').addEventListener('click', closeEmailModal);
+        document.getElementById('cancel-email-modal-btn').addEventListener('click', closeEmailModal);
+
+
+        // Region selection
+        document.querySelectorAll('input[name="regions"]').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const option = e.target.closest('.region-option');
+                if (e.target.checked) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        });
+
+        document.getElementById('save-regions-btn').addEventListener('click', updateSupportRegions);
+
+        // Quick actions on home page
+        document.querySelectorAll('.quick-action').forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.dataset.section;
+                const menuLink = document.querySelector(`.menu-item[data-section='${section}']`);
+                if (menuLink) {
+                    menuLink.click();
+                }
+            });
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('האם אתה בטוח שברצונך להתנתק?')) {
+                logout();
+            }
+        });
+
+        if (document.getElementById('apply-filters-btn')) {
+            initializeStudentFilters();
+        }
+
+        // Personal settings form
+        document.getElementById('personal-settings-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch('/api/user/update-profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        fullName,
+                        phone,
+                        // The backend expects email and address, so we pass the existing ones
+                        email: currentUser.email,
+                        address: currentCompany.address
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('הפרטים עודכנו בהצלחה!', 'success');
+                    // Update user info in the UI
+                    currentUser.fullName = result.user.fullName;
+                    currentUser.phone = result.user.phone;
+                    updateUserInfo();
+                } else {
+                    showAlert(result.error || 'שגיאה בעדכון הפרטים', 'error');
+                }
+            } catch (error) {
+                showAlert('שגיאת רשת. נסה שוב מאוחר יותר.', 'error');
+            }
+        });
+
+        // Company settings form
+        document.getElementById('company-settings-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const address = document.getElementById('companyAddress').value;
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch('/api/user/update-company', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        address,
+                        // The backend expects these fields, so we pass the existing ones
+                        city: currentCompany.city,
+                        phone: currentCompany.phone,
+                        email: currentCompany.email,
+                        supportRegions: currentCompany.supportRegions,
+                        website: currentCompany.website
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('פרטי החברה עודכנו בהצלחה!', 'success');
+                    currentCompany.address = result.company.address;
+                    loadUserSettings();
+                } else {
+                    showAlert(result.error || 'שגיאה בעדכון פרטי החברה', 'error');
+                }
+            } catch (error) {
+                showAlert('שגיאת רשת. נסה שוב מאוחר יותר.', 'error');
+            }
+        });
+
+        // Change email form
+        document.getElementById('change-email-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const newEmail = document.getElementById('newEmail').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch('/api/user/change-email', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ newEmail, currentPassword })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('האימייל שונה בהצלחה!', 'success');
+                    document.getElementById('change-email-form').reset();
+                } else {
+                    showAlert(result.error || 'שגיאה בשינוי האימייל', 'error');
+                }
+            } catch (error) {
+                showAlert('שגיאת רשת. נסה שוב מאוחר יותר.', 'error');
+            }
+        });
+
+    }
+
+
+    async function loadStudents(filters = {}) {
+        if (!accessibleFeatures.includes('students')) return;
+
+        try {
+            const token = localStorage.getItem('authToken');
+            const query = new URLSearchParams(filters).toString();
+            const response = await fetch(`/api/students/admin/students/anonymized?${query}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('שגיאה בטעינת סטודנטים');
+            const data = await response.json();
+            allStudents = data.students || [];
+
+            populateFilterOptions();
+            renderStudents(allStudents);
+
+        } catch (err) {
+            console.error(err);
+            showAlert('שגיאה בטעינת מאגר הסטודנטים', 'error');
+        }
+    }
+
+
+    function populateFilterOptions() {
+        const institutions = [...new Set(allStudents.map(s => s.education?.institution).filter(Boolean))];
+        const studyTypes = [...new Set(allStudents.map(s => s.education?.degreeField).filter(Boolean))];
+
+        const institutionSelect = document.getElementById('institution-filter');
+        const studyTypeSelect = document.getElementById('study-type-filter');
+
+        // Clear existing options except the first one
+        institutionSelect.innerHTML = '<option value="">כל המוסדות</option>';
+        studyTypeSelect.innerHTML = '<option value="">כל התחומים</option>';
+
+        institutions.forEach(inst => {
+            const option = document.createElement('option');
+            option.value = inst;
+            option.textContent = inst;
+            institutionSelect.appendChild(option);
+        });
+
+        studyTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            studyTypeSelect.appendChild(option);
+        });
+    }
+
+    function renderStudents(students) {
+        const list = document.getElementById('students-list');
+        const countElement = document.getElementById('students-count');
+
+        countElement.textContent = students.length;
+        list.innerHTML = '';
+
+        if (students.length === 0) {
+            list.innerHTML = '<p>לא נמצאו סטודנטים התואמים את החיפוש.</p>';
+            return;
+        }
+
+        students.forEach(student => {
+            const card = document.createElement('div');
+            card.className = 'student-card';
+
+            const experienceBadge = student.workExperience?.hasExperience ?
+                '<span class="experience-badge has">יש ניסיון</span>' :
+                '<span class="experience-badge no">אין ניסיון</span>';
+
+            const availability = getAvailabilityText(student.availability?.hoursPerWeek);
+
+            card.innerHTML = `
+                <div class="student-main-info">
+                    <div class="student-info-group">
+                        <h3>${renderBlurredPlaceholders(student.name)}</h3>
+                        <p>${getDegreeText(student.education?.currentDegree)} ב${student.education?.degreeField || 'תחום לא צוין'}</p>
+                    </div>
+                    <div class="student-info-group">
+                        <p><strong>מוסד:</strong> ${student.education?.institution || 'לא צוין'}</p>
+                        <p><strong>ממוצע:</strong> ${student.education?.gpa || 'לא צוין'}</p>
+                    </div>
+                    <div class="student-info-group">
+                        <p><strong>ניסיון:</strong> ${experienceBadge}</p>
+                        <p><strong>זמינות:</strong> ${availability}</p>
+                    </div>
+                </div>
+                <div class="student-actions">
+                    <a href="student-details.html?id=${student.id}" class="btn btn-small student-details-link">
+                        פרטים נוספים
+                    </a>
+                </div>
+            `;
+
+            list.appendChild(card);
+        });
+
+        // Add event listeners to the new links
+        document.querySelectorAll('.student-details-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            });
+        });
+    }
+;
+    function applyStudentFilters(overrideFilters = {}) {
+        let filters = {
+            gpaMin: document.getElementById('gpa-min').value,
+            gpaMax: document.getElementById('gpa-max').value,
+            hasExperience: document.getElementById('experience-filter').value,
+            institution: document.getElementById('institution-filter').value,
+            degreeField: document.getElementById('study-type-filter').value,
+            currentDegree: document.getElementById('education-level-filter').value,
+            hoursPerWeek: document.getElementById('availability-filter').value,
+            studyYear: document.getElementById('study-year-filter').value,
+            flexibleHours: document.getElementById('flexible-hours-filter').value,
+            search: document.getElementById('student-search-input').value
+
+        };
+
+        filters = { ...filters, ...overrideFilters };
+        const activeFilters = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v != null && v !== '' && v !== false));
+        loadStudents(activeFilters);
+    }
+
+
+    function initializeStudentFilters() {
+        // Apply filters
+        document.getElementById('apply-filters-btn').addEventListener('click', () => applyStudentFilters());
+
+        // Search on type
+        let searchTimeout;
+        document.getElementById('student-search-input').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyStudentFilters, 500);
+        });
+
+        // GPA Range Slider Logic
+        const gpaMin = document.getElementById('gpa-min');
+        const gpaMax = document.getElementById('gpa-max');
+        const gpaMinValue = document.getElementById('gpa-min-value');
+        const gpaMaxValue = document.getElementById('gpa-max-value');
+
+        gpaMin.addEventListener('input', () => {
+            gpaMinValue.textContent = gpaMin.value;
+            if (parseInt(gpaMin.value) > parseInt(gpaMax.value)) {
+                gpaMax.value = gpaMin.value;
+                gpaMaxValue.textContent = gpaMin.value;
+            }
+        });
+
+        gpaMax.addEventListener('input', () => {
+            gpaMaxValue.textContent = gpaMax.value;
+            if (parseInt(gpaMax.value) < parseInt(gpaMin.value)) {
+                gpaMin.value = gpaMax.value;
+                gpaMinValue.textContent = gpaMax.value;
+            }
+        });
+
+        // Clear filters
+        document.getElementById('clear-filters-btn').addEventListener('click', () => {
+            document.querySelectorAll('.filter-group input, .filter-group select').forEach(input => {
+                if(input.type === 'range') {
+                    input.value = 60;
+                    input.nextElementSibling.textContent = '60';
+                } else {
+                    input.value = '';
+                }
+            });
+            document.getElementById('student-search-input').value = '';
+            loadStudents();
+        });
+
+        // Sort
+        document.getElementById('sort-students').addEventListener('change', (e) => {
+            sortStudents(e.target.value);
+        });
+    }
+
+    function sortStudents(sortBy) {
+        const sortedStudents = [...allStudents].sort((a, b) => {
+            switch(sortBy) {
+                case 'gpa':
+                    return (b.education?.gpa || 0) - (a.education?.gpa || 0);
+                case 'name':
+                    return (a.name || '').localeCompare(b.name || '', 'he');
+                case 'lastUpdated':
+                default:
+                    return new Date(b.lastUpdated || b.createdAt) - new Date(a.lastUpdated || a.createdAt);
+            }
+        });
+
+        renderStudents(sortedStudents);
+    }
+
+    function closeStudentModal() {
+        document.getElementById('student-modal').style.display = 'none';
+    }
+
+    async function loadFavoriteStudents() {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('/api/user/favorites', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                favoriteStudentsSet = new Set(data.favorites || []);
+            }
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+        }
+    }
+
+    // הוסף קריאה לפונקציה הזאת ב-checkAuth
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('Page loaded, checking authentication...');
+        await checkAuth();
+        updateTime();
+        setInterval(updateTime, 1000);
+        initNavigation();
+        initializeEventListeners();
+
+        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo(0, parseInt(scrollPosition, 10));
+            sessionStorage.removeItem('scrollPosition');
+        }
+    });
+</script>
+</body>
+</html>

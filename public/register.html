@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הרשמה למערכת - TalentMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #2563eb;
+            --muted: #6a7681;
+            --success: #10b981;
+            --success-light: #d1fae5;
+        }
+
+        body {
+            font-family: "Assistant", sans-serif;
+        }
+
+        .font-hebrew { font-family: 'Assistant', sans-serif; }
+        .font-english { font-family: 'Assistant', sans-serif; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .animate-float { animation: float 8s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+
+        .glass-card {
+            backdrop-filter: blur(16px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(37,99,235,0.4);
+        }
+
+        .form-input {
+            transition: all 0.3s ease;
+            border: 2px solid #e1e5e9;
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .form-input:focus {
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: #2563eb;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+            border-color: #2563eb;
+            outline: none;
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 50;
+        }
+
+        [dir="ltr"] .lang-toggle { left: auto; right: 1rem; }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.05"/><circle cx="90" cy="20" r="0.5" fill="white" opacity="0.03"/><circle cx="30" cy="80" r="1.5" fill="white" opacity="0.04"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .flag-he { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMjAgMTYwIj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHdpZHRoPSIyMjAiIGhlaWdodD0iMjAiIHk9IjIwIiBmaWxsPSIjMDA1N2I3Ii8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMCIgeT0iMTIwIiBmaWxsPSIjMDA1N2I3Ii8+PHBvbHlnb24gcG9pbnRzPSIxMTAsNjAgMTMwLDgwIDExMCwxMDAgOTAsODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwNTdiNyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBvbHlnb24gcG9pbnRzPSIxMTAsNzAgMTIwLDgwIDExMCw5MCA5OSw4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDA1N2I3IiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4='); }
+
+        .flag-en { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDA1MmI0Ii8+PHBhdGggZD0iIDAgMCBMIDYwIDMwIE0gMCAzMCBMIDYwIDAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iIDAgMCBMIDYwIDMwIE0gMCAzMCBMIDYwIDAiIHN0cm9rZT0iI2QwMDIxYiIgc3Ryb2tlLXdpZHRoPSIyLjQiLz48cGF0aCBkPSJtIDMwIDAgdiAzMCBtIC0zMCAtMTUgaCA2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjUiLz48cGF0aCBkPSJtIDMwIDAgdiAzMCBtIC0zMCAtMTUgaCA2MCIgc3Ryb2tlPSIjZDAwMjFiIiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4='); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .glass-card { margin: 16px; }
+            .lg\\:flex { flex-direction: column; }
+            .hero-bg { order: 1; }
+            .form-section { order: 2; }
+        }
+    </style>
+</head>
+<body class="font-hebrew bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen">
+<!-- Header -->
+<header class="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 text-[#2563eb]">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">TalentMatch</h1>
+        </div>
+        <a href="/" class="text-[#2563eb] hover:text-[#1d4ed8] font-medium transition-colors">← חזרה לדף הבית</a>
+    </div>
+</header>
+
+<div class="lang-toggle">
+    <button onclick="toggleLanguage()" class="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-white transition-all duration-200 border border-gray-200 shadow-sm flex items-center gap-2">
+        <div id="flagIcon" class="flag-icon flag-en"></div>
+        <span id="langText">English</span>
+    </button>
+</div>
+
+<div class="lg:flex min-h-screen">
+    <!-- Right side - Registration Form -->
+    <div class="lg:w-1/2 flex items-center justify-center form-section">
+        <div class="w-full max-w-2xl px-8 py-8">
+            <div class="glass-card p-8 rounded-2xl">
+                <h2 class="text-right text-4xl font-bold xl:text-5xl mb-2" style="color: var(--accent);" data-he="הרשמה למערכת" data-en="Sign Up">הרשמה למערכת</h2>
+                <p class="text-right text-gray-600 mb-8" data-he="הצטרפו אלינו והתחילו למצוא את הכישרונות הטובים ביותר" data-en="Join us and start finding the best talent">הצטרפו אלינו והתחילו למצוא את הכישרונות הטובים ביותר</p>
+
+                <form id="registrationForm">
+                    <div class="space-y-6">
+                        <!-- Company Name -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="שם החברה" data-en="Company Name">שם החברה</label>
+                            <input name="companyName" class="form-input w-full text-lg" type="text" required>
+                        </div>
+
+                        <!-- Personal Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="שמכם המלא" data-en="Full Name">שמכם המלא</label>
+                                <input name="fullName" class="form-input w-full text-lg" type="text" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="website" data-en="Your company's website">אתר החברה</label>
+                                <input name="website" class="form-input w-full text-lg" type="text" required>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="כתובת אימייל" data-en="Email Address">כתובת אימייל</label>
+                                <input name="email" class="form-input w-full text-lg" type="email" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="מספר טלפון" data-en="Phone Number">מספר טלפון</label>
+                                <input name="phone" class="form-input w-full text-lg" type="tel" required>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="עיר" data-en="City">עיר</label>
+                                <input name="city" class="form-input w-full text-lg" type="text" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="כתובת מלאה" data-en="Full Address">כתובת מלאה</label>
+                                <input name="address" class="form-input w-full text-lg" type="text" required>
+                            </div>
+                        </div>
+
+                        <!-- Login Credentials -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="שם משתמש" data-en="Username">שם משתמש</label>
+                                <input name="username" class="form-input w-full text-lg" type="text" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="סיסמה (8+ תווים)" data-en="Password (8+ chars)">סיסמה (8+ תווים)</label>
+                                <input name="password" class="form-input w-full text-lg" type="password" required>
+                            </div>
+                        </div>
+
+                        <!-- Company Description -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="תיאור החברה" data-en="Company Description">תיאור החברה</label>
+                            <textarea name="companyDescription" rows="3" class="form-input w-full text-lg resize-none" required></textarea>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="isRecruitmentAgency" value="true" class="w-4 h-4 border-gray-300 rounded focus:ring-2 ml-2 text-[#2563eb]">
+                                <label class="text-sm font-medium" style="color: var(--muted);" data-he="האם אתם חברת גיוס?" data-en="Are you a recruitment agency?">האם אתם חברת גיוס?</label>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-3" style="color: var(--muted);" data-he="איזורי פעילות:" data-en="Activity Regions:">איזורי פעילות:</label>
+                                <div class="flex flex-wrap gap-4">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="regions" value="מרכז" class="w-4 h-4 border-gray-300 rounded focus:ring-2 ml-2 text-[#2563eb]">
+                                        <span class="text-sm font-medium" style="color: var(--muted);" data-he="מרכז" data-en="Center">מרכז</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="regions" value="צפון" class="w-4 h-4 border-gray-300 rounded focus:ring-2 ml-2 text-[#2563eb]">
+                                        <span class="text-sm font-medium" style="color: var(--muted);" data-he="צפון" data-en="North">צפון</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="regions" value="דרום" class="w-4 h-4 border-gray-300 rounded focus:ring-2 ml-2 text-[#2563eb]">
+                                        <span class="text-sm font-medium" style="color: var(--muted);" data-he="דרום" data-en="South">דרום</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit" class="btn-primary w-full py-4 px-6 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-lg">
+                            <span data-he="שלח בקשת הרשמה" data-en="Submit Registration">שלח בקשת הרשמה</span>
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-8 text-sm font-medium text-center" style="color: var(--muted);">
+                    <span data-he="כבר יש לכם חשבון?" data-en="Already have an account?">כבר יש לכם חשבון?</span>
+                    <a href="login.html" class="cursor-pointer hover:opacity-80 transition-opacity font-semibold" style="color: var(--accent);" data-he="התחברות כאן" data-en="Login here">התחברות כאן</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Left side - Hero Illustration -->
+    <div class="hero-bg lg:w-1/2 flex items-center justify-center">
+        <div class="w-full h-full flex items-center justify-center p-8 relative z-10">
+            <svg class="w-full h-full max-w-2xl max-h-2xl animate-float" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2563eb;stop-opacity:0.1" />
+                        <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:0.2" />
+                    </linearGradient>
+                    <linearGradient id="formGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+                        <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.85" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    <filter id="shadow">
+                        <feDropShadow dx="0" dy="10" stdDeviation="10" flood-opacity="0.2"/>
+                    </filter>
+                </defs>
+
+                <rect width="500" height="400" fill="url(#bgGradient)"/>
+
+                <!-- Registration form mockup -->
+                <rect x="80" y="50" width="340" height="300" rx="20" fill="url(#formGradient)" stroke="rgba(255,255,255,0.5)" stroke-width="2" filter="url(#shadow)"/>
+
+                <!-- Form header -->
+                <rect x="100" y="70" width="300" height="40" rx="8" fill="rgba(37,99,235,0.1)"/>
+                <circle cx="140" cy="90" r="15" fill="#2563eb" opacity="0.8"/>
+                <circle cx="140" cy="85" r="6" fill="white"/>
+                <path d="M 130 95 Q 140 91 150 95" stroke="white" stroke-width="2" fill="none"/>
+
+                <!-- Form icon -->
+                <rect x="360" y="75" width="12" height="12" rx="2" fill="#2563eb" opacity="0.6"/>
+                <rect x="375" y="75" width="8" height="8" rx="1" fill="#2563eb" opacity="0.4"/>
+                <rect x="360" y="90" width="16" height="4" rx="2" fill="#2563eb" opacity="0.3"/>
+
+                <!-- Form fields mockup -->
+                <g opacity="0.8">
+                    <!-- Company name field -->
+                    <rect x="100" y="130" width="300" height="20" rx="4" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+
+                    <!-- Two column fields -->
+                    <rect x="100" y="160" width="145" height="20" rx="4" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+                    <rect x="255" y="160" width="145" height="20" rx="4" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+
+                    <!-- Contact fields -->
+                    <rect x="100" y="190" width="145" height="20" rx="4" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+                    <rect x="255" y="190" width="145" height="20" rx="4" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+
+                    <!-- Description field -->
+                    <rect x="100" y="220" width="300" height="35" rx="4" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+
+                    <!-- Checkbox options -->
+                    <rect x="100" y="265" width="8" height="8" rx="2" fill="none" stroke="#2563eb" stroke-width="1"/>
+                    <rect x="200" y="265" width="8" height="8" rx="2" fill="none" stroke="#2563eb" stroke-width="1"/>
+                    <rect x="250" y="265" width="8" height="8" rx="2" fill="none" stroke="#2563eb" stroke-width="1"/>
+                </g>
+
+                <!-- Submit button -->
+                <rect x="100" y="290" width="300" height="30" rx="8" fill="#2563eb" filter="url(#glow)"/>
+
+                <!-- Decorative elements -->
+                <circle cx="60" cy="120" r="20" fill="rgba(37,99,235,0.25)" class="animate-float" style="animation-delay: -1s;"/>
+                <rect x="50" y="110" width="20" height="20" rx="4" fill="rgba(255,255,255,0.2)"/>
+
+                <circle cx="440" cy="180" r="25" fill="rgba(29,78,216,0.25)" class="animate-float" style="animation-delay: -3s;"/>
+                <polygon points="430,170 440,160 450,170 445,180 435,180" fill="rgba(255,255,255,0.3)"/>
+
+                <circle cx="50" cy="280" r="18" fill="rgba(16,185,129,0.25)" class="animate-float" style="animation-delay: -5s;"/>
+                <rect x="42" y="272" width="16" height="16" rx="3" fill="rgba(255,255,255,0.2)"/>
+
+                <!-- Connection lines -->
+                <path d="M 105 165 Q 120 155 135 165" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
+                <path d="M 365 185 Q 380 175 395 185" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
+                <path d="M 250 300 Q 270 285 290 300" stroke="rgba(255,255,255,0.4)" stroke-width="3" fill="none"/>
+
+                <!-- Floating geometric shapes -->
+                <rect x="30" y="80" width="12" height="12" rx="2" fill="rgba(255,255,255,0.3)" class="animate-pulse-glow"/>
+                <circle cx="460" cy="100" r="6" fill="rgba(255,255,255,0.3)"/>
+                <polygon points="40,350 55,330 70,350" fill="rgba(255,255,255,0.2)" class="animate-float"/>
+                <rect x="450" y="350" width="15" height="15" rx="3" fill="rgba(255,255,255,0.25)" class="animate-pulse-glow"/>
+
+                <!-- Status dots -->
+                <circle cx="380" cy="90" r="3" fill="#10b981" class="animate-pulse-glow"/>
+                <circle cx="360" cy="140" r="2" fill="#f59e0b"/>
+                <circle cx="370" cy="190" r="2" fill="#ef4444"/>
+                <circle cx="350" cy="240" r="3" fill="#6366f1" class="animate-pulse-glow"/>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'he';
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'he' ? 'en' : 'he';
+        const html = document.documentElement;
+        const langText = document.getElementById('langText');
+        const flagIcon = document.getElementById('flagIcon');
+
+        if (currentLang === 'en') {
+            html.setAttribute('lang', 'en');
+            html.setAttribute('dir', 'ltr');
+            html.classList.remove('font-hebrew');
+            html.classList.add('font-english');
+            langText.textContent = 'עברית';
+            flagIcon.className = 'flag-icon flag-he';
+            document.title = 'Sign Up - TalentMatch';
+        } else {
+            html.setAttribute('lang', 'he');
+            html.setAttribute('dir', 'rtl');
+            html.classList.remove('font-english');
+            html.classList.add('font-hebrew');
+            langText.textContent = 'English';
+            flagIcon.className = 'flag-icon flag-en';
+            document.title = 'הרשמה למערכת - TalentMatch';
+        }
+
+        document.querySelectorAll('[data-he][data-en]').forEach(element => {
+            element.textContent = element.getAttribute(`data-${currentLang}`);
+        });
+    }
+
+    // Form submission
+    document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // יצירת companyId אוטומטית (למשל UUID פשוט)
+        const companyId = 'cmp-' + Date.now();
+
+        // איסוף נתונים מהטופס - שמות שדות תואמים ל-Backend
+        const formData = {
+            username: this.querySelector('input[name="username"]').value || null,
+            email: this.querySelector('input[name="email"]').value || null,
+            password: this.querySelector('input[name="password"]').value || null,
+            fullName: this.querySelector('input[name="fullName"]').value || null,
+            companyName: this.querySelector('input[name="companyName"]').value || null,
+            supportRegions: Array.from(this.querySelectorAll('input[name="regions"]:checked')).map(cb => cb.value) || null,
+            position: 'owner',
+            city: this.querySelector('input[name="city"]').value || null,
+            address: this.querySelector('input[name="address"]').value || null,
+            phone: this.querySelector('input[name="phone"]').value || null,
+            companyDescription: this.querySelector('textarea[name="companyDescription"]').value || null,
+            website: this.querySelector('input[name="website"]').value || null,
+            isRecruitmentAgency: this.querySelector('input[name="isRecruitmentAgency"]').checked || false,
+        };
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.log('Backend response:', result); // DEBUG
+                if (result.details && Array.isArray(result.details)) {
+                    // מנסה להציג param/msg אם קיימים
+                    const messages = result.details.map(d => {
+                        // fallback אם השדות חסרים
+                        const field = d.param || d.field || 'unknown';
+                        const msg = d.msg || d.message || JSON.stringify(d);
+                        return `${field}: ${msg}`;
+                    }).join('\n');
+                    alert('שגיאות בוולידציה:\n' + messages);
+                } else {
+                    alert(result.error || JSON.stringify(result));
+                }
+            }
+
+            if (response.ok) {
+                alert('הרשמה בוצעה בהצלחה!');
+                window.location.href = 'login.html';
+            } else {
+                // הצגת שגיאות וולידציה מפורטות
+                if (result.details && Array.isArray(result.details)) {
+                    const messages = result.details.map(d => `${d.param}: ${d.msg}`).join('\n');
+                    alert('שגיאות בוולידציה:\n' + messages);
+                } else {
+                    alert(result.error || 'שגיאה בהרשמה');
+                }
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            alert('שגיאה בחיבור לשרת');
+        }
+    });
+</script>
+
+</body>
+</html>

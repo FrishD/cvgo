@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8"/>
+    <title>StudyBot - Student Profile</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+        }
+
+        .chat-container {
+            background: #ffffff;
+            padding-bottom: 140px;
+        }
+
+        .search-result {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.15s ease;
+        }
+        .search-result:last-child {
+            border-bottom: none;
+        }
+        .search-result:hover {
+            background-color: #f3f4f6 !important;
+        }
+
+        .message-user {
+            background: #4285f4;
+            color: #ffffff;
+            border-radius: 16px;
+            max-width: 70%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        .message-bot {
+            background: #f5f5f5;
+            color: #000000;
+            border-radius: 16px;
+            max-width: 75%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .input-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 16px;
+            z-index: 50;
+        }
+
+        .input-field {
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            transition: all 0.2s ease;
+            background: #f9f9f9;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 1px #4285f4;
+            background: #ffffff;
+        }
+
+        .btn-send {
+            background: #4285f4;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-send:hover:not(:disabled) {
+            background: #3367d6;
+        }
+
+        .btn-send:disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-send.loading {
+            background: #4285f4;
+            cursor: not-allowed;
+        }
+
+        .file-attachment {
+            color: #4285f4;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-attachment:hover {
+            color: #3367d6;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 16px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+        .option-button {
+            background: #f5f5f5;
+            color: #000000;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .option-button:hover {
+            background: #4285f4;
+            color: #ffffff;
+            border-color: #4285f4;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #f5f5f5;
+            z-index: 60;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4285f4;
+            transition: width 0.5s ease;
+        }
+
+        .avatar-bot {
+            width: 36px;
+            height: 36px;
+            background: #f5f5f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #4285f4;
+            flex-shrink: 0;
+        }
+
+        .avatar-user {
+            width: 36px;
+            height: 36px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .step-counter {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(66, 133, 244, 0.1);
+            color: #4285f4;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 55;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .search-dropdown {
+            position: absolute;
+            bottom: 100%; /* Position above the input instead of below */
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px; /* Add space between dropdown and input */
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search-dropdown.show-below {
+            bottom: auto;
+            top: 100%;
+            margin-bottom: 0;
+            margin-top: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+    </style>
+</head>
+<body class="bg-white">
+<!-- Progress Bar -->
+<div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 6.67%"></div>
+</div>
+
+<!-- Step Counter -->
+<div class="step-counter" id="stepCounter">
+    שלב 1 מתוך 18
+</div>
+
+<!-- Chat Area -->
+<div class="chat-container min-h-screen" id="chatContainer">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+        <div id="chatMessages" class="space-y-4">
+            <!-- Messages will be populated here -->
+        </div>
+    </div>
+</div>
+
+<!-- Fixed Input Bar -->
+<div class="input-bar">
+    <div class="max-w-4xl mx-auto" id="inputArea">
+        <!-- Dynamic input will be populated here -->
+    </div>
+</div>
+
+<script>
+    class StudentProfileChat {
+        constructor() {
+            this.currentStep = 1;
+            this.totalSteps = 18;
+            this.sessionId = null;
+            this.apiBase = '/api/students';
+            this.awaitingInput = false;
+            this.isProcessing = false;
+            this.improvedMessages = this.getImprovedMessages();
+            this.temporaryData = {};
+            this.dataConfirmed = false;
+            this.profileSaved = false;
+            this.resumedSession = false;
+            this.init();
+        }
+
+        getImprovedMessages() {
+            return {
+                1: "היי! 😎 מה קורה? בואו נבנה לך פרופיל...",
+                "2_missing": "יש לי את הפרטים הבסיסיים, אבל חסר לי {missing}...",
+                "2_found": "מצוין! 📂 מצאנו את הפרטים האלה...",
+                3: "מבריק! ספר לי — מה אתה לומד בימים אלה? 🎓",
+                4: "באיזו שנה אתה? 📅",
+                5: "תואר במה? 📚",
+                6: "ואיפה אתה לומד? 🏫",
+                7: "יאללה בואנו נראה מה אתה שווה 😉 מה הממוצע שלך? (0-100) 🎯",
+                8: "תודה! כדי שנהיה שקופים מול החברות — תעלה בנא את גליון הציונים 📊",
+                9: "יש לך ניסיון עבודה או התנדבות בתחום? 💼",
+                10: "עשית משהו מבריק באוניברסיטה?...",
+                11: "איפה אתה גר / מחפש לעבוד? 🌍",
+                12: "כמה שעות בשבוע אתה יכול לעבוד? ⱥ️",
+                13: "אתה גמיש בשעות או מעדיף זמנים קבועים? 🤔",
+                14: "יאללה נשמע מי אתה! ✨...",
+                15: "יש משהו חשוב שתרצה שהחברות ידעו עליך?...",
+                16: "רוצה להוסיף לינקים?...",
+                17: "מהמם! 🎉 סיימנו לבנות את הפרופיל שלך...",
+                18: "לפני שנשמור את הפרופיל, אני צריך שתסכים לתנאי השימוש..."
+            };
+        }
+
+
+        async init() {
+            try {
+                // נסה למצוא session קיים
+                const savedSessionId = sessionStorage.getItem('studentSessionId');
+                if (savedSessionId) {
+                    console.log('Found saved session:', savedSessionId);
+                    try {
+                        await this.resumeExistingSession(savedSessionId);
+                        return;
+                    } catch (error) {
+                        console.log('Failed to resume saved session, starting new');
+                        sessionStorage.removeItem('studentSessionId');
+                    }
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionFromUrl = urlParams.get('session');
+
+                if (sessionFromUrl) {
+                    try {
+                        await this.resumeExistingSession(sessionFromUrl);
+                        return;
+                    } catch (error) {
+                        console.log('Failed to resume URL session, starting new');
+                    }
+                }
+
+                await this.startSession();
+                this.addMessage(this.improvedMessages[1], false, false);
+                this.renderCurrentStep();
+            } catch (error) {
+                this.showTextInput('שגיאה בהתחברות לשרת. אנא רענן את הדף ונסה שוב.');
+            }
+        }
+
+
+        async resumeExistingSession(sessionId) {
+            try {
+                const response = await fetch(`${this.apiBase}/chat/${sessionId}/step`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.sessionId = sessionId;
+                    this.currentStep = data.currentStep;
+                    this.resumedSession = true;
+                    this.updateProgress();
+
+                    this.addMessage(`ברוך הבא בחזרה! ממשיכים משלב ${this.currentStep}`, false, false);
+
+                    // Load existing data if available
+                    if (data.additionalData) {
+                        Object.assign(this.temporaryData, data.additionalData);
+                    }
+
+                    this.renderCurrentStep();
+                    return true;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error('Resume session failed:', error);
+                throw error;
+            }
+        }
+
+        scrollToBottom(smooth = true) {
+            setTimeout(() => {
+                const chatContainer = document.getElementById('chatContainer');
+                const scrollOptions = {
+                    top: chatContainer.scrollHeight,
+                    behavior: smooth ? 'smooth' : 'instant'
+                };
+                chatContainer.scrollTo(scrollOptions);
+            }, 50);
+        }
+
+// עדכן startSession
+        async startSession() {
+            try {
+                const response = await fetch(`${this.apiBase}/chat/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to start session');
+                }
+
+                this.sessionId = data.sessionId;
+                this.currentStep = data.currentStep || 1;
+                this.updateProgress();
+
+                // שמור session לחזרה מאוחרת
+                sessionStorage.setItem('studentSessionId', this.sessionId);
+
+                // עדכן URL בלי לרענן דף
+                const newUrl = `${window.location.pathname}?session=${this.sessionId}`;
+                window.history.replaceState({}, '', newUrl);
+
+                console.log('Session started:', this.sessionId);
+                return data;
+            } catch (error) {
+                console.error('Failed to start session:', error);
+                throw error;
+            }
+        }
+
+
+        updateProgress() {
+            const progressPercent = (this.currentStep / this.totalSteps) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            document.getElementById('stepCounter').textContent = `שלב ${this.currentStep} מתוך ${this.totalSteps}`;
+        }
+
+        addMessage(content, isUser = false, showTime = true) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+
+            const timeString = showTime ? new Date().toLocaleTimeString('he-IL', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : '';
+
+            if (isUser) {
+                messageDiv.className = 'flex items-start gap-3 justify-end';
+                messageDiv.innerHTML = `
+                    <div class="flex flex-col items-end">
+                        <div class="message-user px-4 py-3">
+                            <p class="text-sm leading-relaxed whitespace-pre-line">${content}</p>
+                        </div>
+                        ${timeString ? `<div class="message-time">${timeString}</div>` : ''}
+                    </div>
+                    <div class="avatar-user">
+                        U
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'flex items-start gap-3';
+                messageDiv.innerHTML = `
+                    <div class="avatar-bot">
+                        S
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="message-bot px-4 py-3">
+                            <p class="text-sm leading-relaxed whitespace-pre-line">${content}</p>
+                        </div>
+                        ${timeString ? `<div class="message-time">${timeString}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            messagesContainer.appendChild(messageDiv);
+            this.scrollToBottom();
+        }
+
+        showTyping() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator flex items-start gap-3';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="avatar-bot">
+                    S
+                </div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            this.scrollToBottom();
+        }
+
+        hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        setLoadingState(isLoading) {
+            const sendBtn = document.getElementById('sendBtn');
+            if (!sendBtn) return;
+
+            if (isLoading) {
+                sendBtn.disabled = true;
+                sendBtn.classList.add('loading');
+                sendBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="loading-spinner">
+                        <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z"/>
+                    </svg>
+                `;
+            } else {
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('loading');
+                sendBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                `;
+            }
+        }
+
+        async nextStep(userResponse = null, stepData = null) {
+            if (this.isProcessing) return;
+            this.isProcessing = true;
+
+            try {
+                if (userResponse && !this.awaitingInput) {
+                    this.addMessage(userResponse, true);
+                }
+
+                // שמירה זמנית בלבד - לא ב-DB עד אישור התנאים
+                if (stepData && this.currentStep <= 17) {
+                    this.temporaryData[this.currentStep] = stepData;
+                }
+
+                if (this.currentStep < 18) {
+                    this.showTyping();
+                    setTimeout(() => {
+                        this.hideTyping();
+                        this.currentStep++;
+                        const message = this.improvedMessages[this.currentStep];
+                        if (message) this.addMessage(message);
+                        this.renderCurrentStep();
+                        this.updateProgress();
+                        this.isProcessing = false;
+                    }, 800);
+                } else {
+                    // רק כאן שמירה ב-DB לאחר אישור תנאי שימוש
+                    this.isProcessing = false;
+                }
+            } catch (error) {
+                this.hideTyping();
+                this.isProcessing = false;
+            }
+        }
+
+        // שמירה ב-DB רק לאחר אישור תנאים
+// תיקון ב-HTML - saveAllDataToDB method
+        async saveAllDataToDB() {
+            try {
+                console.log('Saving profile data to database...');
+
+                // הכן נתונים בסיסיים
+                const basicData = {
+                    name: this.parsedData?.name || '',
+                    email: this.parsedData?.email || '',
+                    phone: this.parsedData?.phone || ''
+                };
+
+                console.log('Basic data to save:', basicData);
+
+                const response = await fetch(`${this.apiBase}/chat/${this.sessionId}/save-profile`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        profileData: this.temporaryData,
+                        basicData: basicData, // הוסף נתונים בסיסיים
+                        termsAccepted: true
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.success) throw new Error(result.error);
+
+                this.addMessage('הפרופיל נשמר בהצלחה! 🎉');
+                this.profileSaved = true;
+
+                const inputArea = document.getElementById('inputArea');
+                inputArea.innerHTML = `
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-medium">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    הפרופיל נשמר בהצלחה
+                </div>
+            </div>
+        `;
+            } catch (error) {
+                console.error('Failed to save profile:', error);
+                this.addMessage('שגיאה בשמירת הפרופיל. אנא נסה שוב.');
+            }
+        }
+
+
+        renderCurrentStep(stepConfig = null) {
+            if (!stepConfig) {
+                stepConfig = this.getDefaultStepConfig();
+            }
+            this.renderInput(stepConfig);
+        }
+
+        getDefaultStepConfig() {
+            const steps = {
+                1: {type: "file_upload", buttonText: "העלה קובץ CV 📄", accept: ".pdf,.doc,.docx"},
+                2: {type: "verification"},
+                3: {
+                    type: "buttons",
+                    options: [
+                        {value: "bachelor", label: "🎓 תואר ראשון"},
+                        {value: "master", label: "🎓 תואר שני"},
+                        {value: "certificate", label: "📜 תעודה"},
+                        {value: "professional_course", label: "📚 קורס מקצועי"},
+                        {value: "other", label: "🧠 אחר"}
+                    ]
+                },
+                4: {
+                    type: "slider",
+                    min: 0,
+                    max: 7,
+                    labels: ["טרום אקדמיה", "שנה א'", "שנה ב'", "שנה ג'", "שנה ד'", "שנה ה'", "שנה ו'", "בוגר"],
+                    placeholder: "בחר שנת לימודים"
+                },
+                5: {
+                    type: "search_select",
+                    placeholder: "חפש תחום לימודים...",
+                    options: "degrees"
+                },
+                6: {
+                    type: "search_select",
+                    placeholder: "חפש מוסד לימודים...",
+                    options: "institutions"
+                },
+                7: {type: "number", placeholder: "הכנס ממוצע (0-100)", min: 0, max: 100},
+                8: {type: "file_upload", buttonText: "העלה גליון ציונים 📊", accept: ".pdf,.jpg,.jpeg,.png"},
+                9: {
+                    type: "yes_no",
+                    options: [
+                        {value: "yes", label: "👍 כן", followUp: "textarea"},
+                        {value: "no", label: "👎 לא"}
+                    ]
+                },
+                10: {type: "textarea", placeholder: "ספר על תפקידים מיוחדים או הישגים..."},
+                11: {type: "text", placeholder: "למשל: תל אביב / אזור השרון"},
+                12: {
+                    type: "buttons",
+                    options: [
+                        {value: "full_time", label: "💼 משרה מלאה"},
+                        {value: "part_time", label: "⏳ חצי משרה"},
+                        {value: "flexible", label: "🌀 גמיש"},
+                        {value: "other", label: "📝 אחר"}
+                    ]
+                },
+                13: {
+                    type: "yes_no",
+                    options: [
+                        {value: "yes", label: "👍 כן", followUp: "text"},
+                        {value: "no", label: "👎 לא"}
+                    ]
+                },
+                14: {type: "textarea", placeholder: "כתוב כמה משפטים על עצמך..."},
+                15: {type: "textarea", placeholder: "מידע נוסף שחשוב לך לשתף..."},
+                16: {type: "links"},
+                17: {type: "summary"},
+                18: {type: "terms"}
+            };
+
+            return steps[this.currentStep] || {type: "text", placeholder: "הכנס תשובה"};
+        }
+
+        getDegreesList() {
+            return [
+                "מדעי המחשב", "הנדסת תוכנה", "הנדסת מחשבים", "הנדסה חשמלית",
+                "הנדסה מכנית", "הנדסה כימית", "הנדסה תעשייתי ונידול", "הנדסה אזרחית",
+                "כלכלה", "מנהל עסקים", "חשבונאות", "מימון", "שיווק", "כלכלה וחשבונאות",
+                "משפטים", "פסיכולוגיה", "סוציולוגיה", "מדעי המדינה", "יחסים בינלאומיים",
+                "תקשורת", "עיתונאות", "יחסי צבוי", "פרסום", "רפואה", "סיעוד", "רוקחות",
+                "ביולוגיה", "כימיה", "פיזיקה", "מתמטיקה", "סטטיסטיקה", "גיאוגרפיה",
+                "היסטוריה", "פילוסופיה", "ספרות עברית", "ספרות אנגלית", "בלשנות",
+                "חינוך", "עבודה סוציאלית", "אמנויות", "מוזיקה", "תיאטרון", "קולנוע"
+            ];
+        }
+
+        getInstitutionsList() {
+            return [
+                "אוניברסיטת תל אביב", "האוניברסיטה העברית בירושלים", "טכניון - מכון טכנולוגי לישראל",
+                "אוניברסיטת בן גוריון בנגב", "אוניברסיטת בר אילן", "אוניברסיטת חיפה",
+                "אוניברסיטת אריאל בשומרון", "הקריה האקדמית אונו", "מכללת תל אביב יפו",
+                "המכללה האקדמית נתניה", "המכללה האקדמית כנרת", "מכללת ספיר",
+                "המכון הטכנולוגי חולון", "מכללת שנקר", "מכללת רופין", "מכללת אשקלון",
+                "המכללה למנהל", "מכללת הדסים", "מכללת לויסקי", "המרכז האקדמי לב",
+                "המכללה האקדמית בית ברל", "מכללת סמי שמעון", "המכללה האקדמית עמק יזרעאל",
+                "מכללת ברוך", "מכללת אפקה", "בצלאל - אקדמיה לאמנות ועיצוב"
+            ];
+        }
+
+        renderSearchSelect(stepConfig) {
+            const inputArea = document.getElementById('inputArea');
+
+            const lists = {
+                degrees: this.getDegreesList(),
+                institutions: this.getInstitutionsList()
+            };
+
+            const options = lists[stepConfig.options] || [];
+            const fuse = new Fuse(options, {
+                threshold: 0.3,
+                includeScore: true,
+                keys: [{name: 'item', weight: 1}]
+            });
+
+            inputArea.innerHTML = `
+        <div class="flex items-center gap-3">
+            <div class="flex-1 relative">
+                <input type="text" class="input-field w-full px-4 py-3"
+                       placeholder="${stepConfig.placeholder}" id="searchInput" autocomplete="off">
+                <div id="searchResults" class="search-dropdown hidden"></div>
+            </div>
+            <button class="btn-send flex items-center justify-center" id="sendBtn" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    `;
+
+            const input = document.getElementById('searchInput');
+            const results = document.getElementById('searchResults');
+            const sendBtn = document.getElementById('sendBtn');
+            let selectedValue = '';
+            let validSelection = false;
+
+            // Check if there's enough space above for dropdown
+            const checkDropdownPosition = () => {
+                const inputRect = input.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const spaceAbove = inputRect.top;
+                const spaceBelow = viewportHeight - inputRect.bottom;
+
+                if (spaceAbove > 250 || spaceAbove > spaceBelow) {
+                    results.classList.remove('show-below');
+                } else {
+                    results.classList.add('show-below');
+                }
+            };
+
+            const showAllOptions = () => {
+                checkDropdownPosition();
+                results.innerHTML = options.slice(0, 8).map(option =>
+                    `<div class="search-result px-4 py-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0">${option}</div>`
+                ).join('');
+                results.classList.remove('hidden');
+                attachClickHandlers();
+            };
+
+            const attachClickHandlers = () => {
+                results.querySelectorAll('.search-result').forEach(item => {
+                    item.addEventListener('click', () => {
+                        selectedValue = item.textContent;
+                        validSelection = true;
+                        input.value = selectedValue;
+                        results.classList.add('hidden');
+                        sendBtn.disabled = false;
+                    });
+                });
+            };
+
+            input.addEventListener('focus', () => {
+                setTimeout(showAllOptions, 100); // Delay to ensure proper positioning
+            });
+
+            input.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                validSelection = false;
+                sendBtn.disabled = true;
+
+                if (query.length === 0) {
+                    showAllOptions();
+                    return;
+                }
+
+                if (query.length < 2) {
+                    results.classList.add('hidden');
+                    return;
+                }
+
+                checkDropdownPosition();
+                const searchResults = fuse.search(query).slice(0, 6);
+                if (searchResults.length === 0) {
+                    results.innerHTML = '<div class="px-4 py-2 text-gray-500">לא נמצאו תוצאות</div>';
+                    results.classList.remove('hidden');
+                    return;
+                }
+
+                results.innerHTML = searchResults.map(result =>
+                    `<div class="search-result px-4 py-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0">${result.item}</div>`
+                ).join('');
+
+                results.classList.remove('hidden');
+                attachClickHandlers();
+
+                // Check if input exactly matches an option
+                const exactMatch = options.find(option =>
+                    option.toLowerCase() === query.toLowerCase()
+                );
+                if (exactMatch) {
+                    selectedValue = exactMatch;
+                    validSelection = true;
+                    sendBtn.disabled = false;
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !results.contains(e.target)) {
+                    results.classList.add('hidden');
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (!results.classList.contains('hidden')) {
+                    checkDropdownPosition();
+                }
+            });
+
+            sendBtn.addEventListener('click', () => {
+                if (!validSelection && !options.includes(selectedValue)) {
+                    this.addMessage('אנא בחר אפשרות מהרשימה או הקלד בדיוק כפי שמופיע ברשימה', false);
+                    return;
+                }
+
+                const value = selectedValue || input.value.trim();
+                if (value) {
+                    const stepData = {response: value};
+                    this.temporaryData[this.currentStep] = stepData;
+                    this.nextStep(value, stepData);
+                }
+            });
+
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    if (!validSelection && !options.includes(selectedValue)) {
+                        this.addMessage('אנא בחר אפשרות מהרשימה או הקלד בדיוק כפי שמופיע ברשימה', false);
+                        return;
+                    }
+
+                    const value = selectedValue || input.value.trim();
+                    if (value) {
+                        const stepData = {response: value};
+                        this.temporaryData[this.currentStep] = stepData;
+                        this.nextStep(value, stepData);
+                    }
+                }
+            });
+        }
+
+        renderInput(stepConfig) {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = '';
+
+            switch (stepConfig.type) {
+                case 'file_upload':
+                    this.renderFileUpload(stepConfig);
+                    break;
+                case 'verification':
+                    this.renderVerification(stepConfig);
+                    break;
+                case 'buttons':
+                    this.renderButtons(stepConfig);
+                    break;
+                case 'search_select':
+                    this.renderSearchSelect(stepConfig);
+                    break;
+                case 'slider':
+                    this.renderSlider(stepConfig);
+                    break;
+                case 'text':
+                case 'number':
+                    this.renderTextInput(stepConfig);
+                    break;
+                case 'yes_no':
+                    this.renderButtons(stepConfig);
+                    break;
+                case 'textarea':
+                    this.renderTextInput(stepConfig, true);
+                    break;
+                case 'links':
+                    this.renderLinks(stepConfig);
+                    break;
+                case 'summary':
+                    this.renderSummary(stepConfig);
+                    break;
+                case 'terms':
+                    this.renderTerms(stepConfig);
+                    break;
+                default:
+                    this.showTextInput('שלב לא מוכר');
+            }
+        }
+
+        renderSlider(stepConfig) {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = `
+        <div class="space-y-4">
+            <div class="text-center text-sm text-gray-600" id="sliderValue">
+                ${stepConfig.labels[0]}
+            </div>
+            <div class="px-4">
+                <input type="range" min="${stepConfig.min}" max="${stepConfig.max}"
+                       value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                       id="yearSlider">
+            </div>
+            <div class="flex justify-center">
+                <button class="btn-send flex items-center justify-center" id="sendBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `;
+
+            const slider = document.getElementById('yearSlider');
+            const valueDisplay = document.getElementById('sliderValue');
+            const sendBtn = document.getElementById('sendBtn');
+
+            slider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                valueDisplay.textContent = stepConfig.labels[value];
+            });
+
+            sendBtn.addEventListener('click', () => {
+                if (this.isProcessing) return;
+                const value = parseInt(slider.value);
+                const label = stepConfig.labels[value];
+                const stepData = { response: value.toString() };
+                this.nextStep(label, stepData);
+            });
+        }
+
+        renderTerms() {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = `
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <button class="option-button" id="agreeBtn">אני מסכים לתנאי השימוש</button>
+                    <button class="option-button" id="disagreeBtn">לא מסכים</button>
+                </div>
+                <div class="text-center mt-2">
+                    <a href="/terms" target="_blank" class="text-xs text-blue-500 hover:underline">קרא תנאי שימוש</a>
+                    <span class="text-xs text-gray-500 mx-2">|</span>
+                    <a href="/privacy" target="_blank" class="text-xs text-blue-500 hover:underline">מדיניות פרטיות</a>
+                </div>
+            `;
+
+            document.getElementById('agreeBtn').addEventListener('click', () => {
+                if (this.isProcessing) return;
+                this.addMessage('אני מסכים לתנאי השימוש', true);
+                this.dataConfirmed = true;
+                this.temporaryData[18] = {response: 'agreed'};
+                this.saveAllDataToDB(); // רק כאן נשמר ב-DB
+            });
+
+            document.getElementById('disagreeBtn').addEventListener('click', () => {
+                this.addMessage('לא מסכים', true);
+                this.addMessage('לצערנו, לא ניתן להמשיך ללא הסכמה לתנאי השימוש.');
+                const inputArea = document.getElementById('inputArea');
+                inputArea.innerHTML = '<div class="text-center text-gray-500">תודה על הזמן!</div>';
+            });
+        }
+
+        renderFileUpload(stepConfig) {
+            const inputArea = document.getElementById('inputArea');
+            const uploadType = this.currentStep === 1 ? 'cv' : 'transcript';
+
+            inputArea.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <input type="file" id="fileInput" class="hidden" accept="${stepConfig.accept}">
+                    <button class="file-attachment p-2 hover:bg-gray-50 rounded-full" id="attachBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        </svg>
+                    </button>
+                    <div class="flex-1">
+                        <input type="text" class="input-field w-full px-4 py-3 pr-12" placeholder="${stepConfig.buttonText}" readonly id="fileDisplay">
+                    </div>
+                    <button class="btn-send flex items-center justify-center" id="sendBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            const attachBtn = document.getElementById('attachBtn');
+            const fileInput = document.getElementById('fileInput');
+            const fileDisplay = document.getElementById('fileDisplay');
+            const sendBtn = document.getElementById('sendBtn');
+
+            attachBtn.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    fileDisplay.value = file.name;
+                    sendBtn.disabled = false;
+                    sendBtn.addEventListener('click', () => this.handleFileUpload(file, uploadType), {once: true});
+                }
+            });
+        }
+
+        async renderVerification() {
+            try {
+                let extractedData;
+
+                if (this.existingUserData) {
+                    const improvedMessage = `נמצא פרופיל קיים עבור **${this.existingUserData.name}**\n\nהאם ברצונך לעדכן את הפרופיל הקיים או ליצור חדש?`;
+                    this.addMessage(improvedMessage);
+
+                    this.renderButtons({
+                        type: "buttons",
+                        options: [
+                            {value: "replace", label: "✏️ עדכן פרופיל קיים"},
+                            {value: "new", label: "➕ צור פרופיל חדש"}
+                        ]
+                    });
+                    return;
+                }
+
+                if (this.parsedData) {
+                    extractedData = this.parsedData;
+                } else {
+                    // נתונים מדומים לצורך הדגמה
+                    extractedData = {
+                        name: 'לא זוהה',
+                        email: 'לא זוהה',
+                        phone: 'לא זוהה'
+                    };
+                }
+
+                const missingFields = [];
+                if (!extractedData.name || extractedData.name === 'לא זוהה') missingFields.push('שם מלא');
+                if (!extractedData.email || extractedData.email === 'לא זוהה') missingFields.push('אימייל');
+                if (!extractedData.phone || extractedData.phone === 'לא זוהה') missingFields.push('טלפון');
+
+                if (missingFields.length > 0) {
+                    const message = this.improvedMessages['2_missing']
+                        .replace('{missing}', missingFields.join(', '))
+                        .replace('{first}', missingFields[0]);
+
+                    this.addMessage(message);
+                    this.awaitingMissingData = {missing: missingFields, current: 0, data: extractedData};
+                    this.renderTextInput({type: 'text', placeholder: `הכנס ${missingFields[0]}`});
+                } else {
+                    const dataText = [
+                        extractedData.name ? `**שם:** ${extractedData.name}` : null,
+                        extractedData.email ? `**אימייל:** ${extractedData.email}` : null,
+                        extractedData.phone ? `**טלפון:** ${extractedData.phone}` : null
+                    ].filter(Boolean).join('\n');
+
+                    if (dataText) {
+                        const verificationMessage = this.improvedMessages['2_found'].replace('{data}', dataText);
+                        this.addMessage(verificationMessage);
+                    }
+
+                    setTimeout(() => {
+                        this.renderButtons({
+                            type: "buttons",
+                            options: [
+                                {value: "correct", label: "✅ נכון"},
+                                {value: "incorrect", label: "✏️ צריך לתקן"}
+                            ]
+                        });
+                    }, 300);
+                }
+
+            } catch (error) {
+                this.addMessage('שגיאה בטעינת נתוני הקובץ');
+                console.error('Verification render error:', error);
+            }
+        }
+
+
+        async handleExistingUserReplace() {
+            this.addMessage('עדכן פרופיל קיים', true);
+            this.addMessage('הפרופיל הקיים יעודכן עם המידע החדש');
+            this.existingUserData = null;
+            this.currentStep = 3;
+            this.updateProgress();
+            setTimeout(() => {
+                this.addMessage(this.improvedMessages[3]);
+                this.renderCurrentStep();
+            }, 500);
+        }
+
+        async handleExistingUserNew() {
+            this.addMessage('צור פרופיל חדש', true);
+            this.addMessage('ממשיכים עם פרופיל חדש');
+            this.existingUserData = null;
+            this.currentStep = 2;
+            this.updateProgress();
+            setTimeout(() => this.renderVerification(), 500);
+        }
+
+        renderButtons(stepConfig) {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = `
+        <div class="flex flex-wrap gap-2 justify-center">
+            ${stepConfig.options.map(option => `
+                <button class="option-button option-btn" data-value="${option.value}" data-label="${option.label}">
+                    ${option.label}
+                </button>
+            `).join('')}
+        </div>
+    `;
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (this.isProcessing) return;
+
+                    const option = stepConfig.options.find(opt => opt.value === e.target.dataset.value);
+
+                    // Handle verification step corrections
+                    if (this.currentStep === 2) {
+                        if (e.target.dataset.value === 'correct') {
+                            this.addMessage('נכון ✅', true);
+                            this.nextStep();
+                        } else if (e.target.dataset.value === 'incorrect') {
+                            this.addMessage('צריך לתקן', true);
+                            this.addMessage('איזה פרט תרצה לתקן?');
+                            this.renderButtons({
+                                type: "buttons",
+                                options: [
+                                    {value: "fix_name", label: "📝 תקן שם"},
+                                    {value: "fix_email", label: "📧 תקן אימייל"},
+                                    {value: "fix_phone", label: "📱 תקן טלפון"},
+                                    {value: "fix_all", label: "🔄 תקן הכל"}
+                                ]
+                            });
+                            this.correctionMode = true;
+                            return;
+                        }
+                    }
+
+                    // Handle correction mode
+                    if (this.correctionMode) {
+                        this.addMessage(e.target.dataset.label, true);
+
+                        if (e.target.dataset.value === 'fix_name') {
+                            this.addMessage('הכנס את השם הנכון:');
+                            this.renderTextInput({type: 'text', placeholder: 'הכנס שם מלא'});
+                            this.fixingField = 'name';
+                        } else if (e.target.dataset.value === 'fix_email') {
+                            this.addMessage('הכנס את האימייל הנכון:');
+                            this.renderTextInput({type: 'email', placeholder: 'הכנס אימייל'});
+                            this.fixingField = 'email';
+                        } else if (e.target.dataset.value === 'fix_phone') {
+                            this.addMessage('הכנס את הטלפון הנכון:');
+                            this.renderTextInput({type: 'tel', placeholder: 'הכנס מספר טלפון'});
+                            this.fixingField = 'phone';
+                        } else if (e.target.dataset.value === 'fix_all') {
+                            this.addMessage('בואנו נתקן הכל. תתחיל עם השם:');
+                            this.renderTextInput({type: 'text', placeholder: 'הכנס שם מלא'});
+                            this.fixingField = 'name';
+                            this.fixingAll = true;
+                            this.fixingQueue = ['email', 'phone'];
+                        }
+                        return;
+                    }
+
+                    // Handle other button types (existing logic)
+                    if (e.target.dataset.value === 'replace' && this.existingUserData) {
+                        this.handleExistingUserReplace();
+                    } else if (e.target.dataset.value === 'new' && this.existingUserData) {
+                        this.handleExistingUserNew();
+                    } else if (option && option.followUp) {
+                        this.addMessage(e.target.dataset.label, true);
+                        this.addMessage(`נהדר! עכשיו ${option.followUp === 'textarea' ? 'ספר לי יותר על זה:' : 'תן לי פרטים נוספים:'}`);
+                        this.renderTextInput({
+                            type: option.followUp,
+                            placeholder: option.followUp === 'textarea' ? 'תאר את הניסיון שלך...' : 'פרט על הגמישות שלך...'
+                        }, option.followUp === 'textarea');
+                        this.pendingYesNo = {value: e.target.dataset.value, label: e.target.dataset.label};
+                    } else {
+                        const stepData = {response: e.target.dataset.value};
+                        this.nextStep(e.target.dataset.label, stepData);
+                    }
+                });
+            });
+        }
+
+
+        renderTextInput(stepConfig, isTextarea = false) {
+            const inputArea = document.getElementById('inputArea');
+            const inputType = isTextarea ? 'textarea' : (stepConfig.type === 'number' ? 'number' : 'text');
+
+            inputArea.innerHTML = `
+        <div class="flex items-${isTextarea ? 'end' : 'center'} gap-3">
+            <div class="flex-1">
+                <${isTextarea ? 'textarea' : 'input'}
+                    type="${inputType}"
+                    class="input-field w-full px-4 py-3 pr-12 ${isTextarea ? 'min-h-[80px] resize-none' : ''}"
+                    placeholder="${stepConfig.placeholder || 'הכנס תשובה'}"
+                    id="textInput"
+                    ${stepConfig.min !== undefined ? `min="${stepConfig.min}"` : ''}
+                    ${stepConfig.max !== undefined ? `max="${stepConfig.max}"` : ''}
+                ></${isTextarea ? 'textarea' : 'input'}>
+            </div>
+            <button class="btn-send flex items-center justify-center" id="sendBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    `;
+
+            const input = document.getElementById('textInput');
+            const sendBtn = document.getElementById('sendBtn');
+
+            input.focus();
+
+            const submitHandler = () => {
+                if (this.isProcessing) return;
+
+                let value = input.value.trim();
+
+                // Validation for number inputs (GPA)
+                if (stepConfig.type === 'number') {
+                    const numValue = parseFloat(value);
+                    if (isNaN(numValue) || numValue < (stepConfig.min || 0) || numValue > (stepConfig.max || 100)) {
+                        this.addMessage(`אנא הכנס מספר בין ${stepConfig.min || 0} ל-${stepConfig.max || 100}`, false);
+                        return;
+                    }
+                    value = numValue.toString();
+                }
+
+                if (!value && stepConfig.type !== 'textarea') {
+                    this.addMessage('אנא הכנס תשובה');
+                    return;
+                }
+
+                this.setLoadingState(true);
+
+                // Handle correction mode
+                if (this.correctionMode && this.fixingField) {
+                    this.addMessage(value, true);
+
+                    // Update the parsed data
+                    if (!this.parsedData) this.parsedData = {};
+                    this.parsedData[this.fixingField] = value;
+
+                    if (this.fixingAll && this.fixingQueue.length > 0) {
+                        // Continue fixing next field
+                        const nextField = this.fixingQueue.shift();
+                        this.fixingField = nextField;
+
+                        const fieldName = nextField === 'email' ? 'אימייל' : 'טלפון';
+                        const placeholder = nextField === 'email' ? 'הכנס אימייל' : 'הכנס מספר טלפון';
+
+                        this.addMessage(`עכשיו הכנס את ה${fieldName}:`);
+                        this.renderTextInput({type: nextField === 'email' ? 'email' : 'tel', placeholder});
+                    } else {
+                        // Done fixing - show updated data
+                        this.correctionMode = false;
+                        this.fixingField = null;
+                        this.fixingAll = false;
+                        this.fixingQueue = [];
+
+                        const dataText = [
+                            this.parsedData.name ? `**שם:** ${this.parsedData.name}` : null,
+                            this.parsedData.email ? `**אימייל:** ${this.parsedData.email}` : null,
+                            this.parsedData.phone ? `**טלפון:** ${this.parsedData.phone}` : null
+                        ].filter(Boolean).join('\n');
+
+                        this.addMessage(`מעולה! עכשיו הנתונים המעודכנים:\n\n${dataText}\n\nהכל נכון?`);
+
+                        this.renderButtons({
+                            type: "buttons",
+                            options: [
+                                {value: "correct", label: "✅ נכון"},
+                                {value: "incorrect", label: "✏️ צריך לתקן עוד"}
+                            ]
+                        });
+                    }
+                    this.setLoadingState(false);
+                    return;
+                }
+
+                // Handle missing data input
+                if (this.awaitingMissingData) {
+                    this.handleMissingDataInput(value);
+                } else if (this.pendingYesNo) {
+                    const stepData = {
+                        response: this.pendingYesNo.value,
+                        additionalData: value ? {description: value, details: value} : null
+                    };
+                    this.nextStep(`${this.pendingYesNo.label}${value ? ': ' + value : ''}`, stepData);
+                    this.pendingYesNo = null;
+                } else {
+                    const stepData = {response: value || 'דילגתי על השאלה'};
+                    this.nextStep(value || 'דילגתי על השאלה', stepData);
+                }
+            };
+
+            sendBtn.addEventListener('click', submitHandler);
+
+            if (!isTextarea) {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        submitHandler();
+                    }
+                });
+            } else {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        submitHandler();
+                    }
+                });
+            }
+        }
+
+        handleMissingDataInput(value) {
+            const missingData = this.awaitingMissingData;
+            const fieldName = missingData.missing[missingData.current];
+
+            if (fieldName === 'שם מלא') missingData.data.name = value;
+            else if (fieldName === 'אימייל') missingData.data.email = value;
+            else if (fieldName === 'טלפון') missingData.data.phone = value;
+
+            this.addMessage(value, true);
+
+            missingData.current++;
+
+            if (missingData.current < missingData.missing.length) {
+                const nextField = missingData.missing[missingData.current];
+                this.addMessage(`תודה! עכשיו הכנס את ${nextField}:`);
+                this.renderTextInput({type: 'text', placeholder: `הכנס ${nextField}`});
+            } else {
+                const completeMessage = `מעולה! עכשיו יש לי את כל הפרטים:\n\n**שם:** ${missingData.data.name}\n**אימייל:** ${missingData.data.email}\n**טלפון:** ${missingData.data.phone}\n\nהפרטים נכונים?`;
+                this.addMessage(completeMessage);
+                this.awaitingMissingData = null;
+                this.renderButtons({
+                    type: "buttons",
+                    options: [
+                        {value: "correct", label: "נכון ✅"},
+                        {value: "incorrect", label: "צריך לתקן"}
+                    ]
+                });
+                this.parsedData = missingData.data;
+            }
+            this.setLoadingState(false);
+        }
+
+        renderLinks() {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = `
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <button class="option-button" id="noLinksBtn">אין כרגע</button>
+                    <button class="option-button" id="addLinksBtn">הוסף קישורים</button>
+                </div>
+            `;
+
+            document.getElementById('noLinksBtn').addEventListener('click', () => {
+                if (this.isProcessing) return;
+                const stepData = {response: 'none'};
+                this.nextStep('אין לינקים כרגע', stepData);
+            });
+
+            document.getElementById('addLinksBtn').addEventListener('click', () => {
+                if (this.isProcessing) return;
+                this.addMessage('הוסף קישורים', true);
+                this.addMessage('איזה קישורים תרצה להוסיף?');
+                this.showLinksInput();
+            });
+        }
+
+        showLinksInput() {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1">
+                            <input type="url" class="input-field w-full px-4 py-3" placeholder="GitHub - https://github.com/username" id="githubInput">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1">
+                            <input type="url" class="input-field w-full px-4 py-3" placeholder="LinkedIn - https://linkedin.com/in/username" id="linkedinInput">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1">
+                            <input type="url" class="input-field w-full px-4 py-3" placeholder="Portfolio - https://myportfolio.com" id="portfolioInput">
+                        </div>
+                        <button class="btn-send flex items-center justify-center" id="submitLinksBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('submitLinksBtn').addEventListener('click', () => {
+                if (this.isProcessing) return;
+                this.submitLinks();
+            });
+        }
+
+        submitLinks() {
+            const links = {};
+            ['github', 'linkedin', 'portfolio'].forEach(type => {
+                const input = document.getElementById(type + 'Input');
+                if (input && input.value.trim()) {
+                    links[type] = input.value.trim();
+                }
+            });
+
+            const stepData = {
+                response: Object.keys(links).length > 0 ? 'added_links' : 'no_links',
+                additionalData: links
+            };
+
+            const displayLinks = Object.entries(links).map(([type, url]) => `${type}: ${url}`);
+            const message = displayLinks.length > 0 ? `לינקים: ${displayLinks.join(', ')}` : 'אין לינקים כרגע';
+            this.nextStep(message, stepData);
+        }
+
+        async renderSummary() {
+            try {
+                const profile = this.generateProfileSummary();
+                const summaryText = this.formatProfileSummary(profile);
+
+                setTimeout(() => {
+                    this.addMessage(summaryText);
+
+                    const inputArea = document.getElementById('inputArea');
+                    inputArea.innerHTML = `
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <button class="option-button" id="continueBtn">הכל נראה טוב, בואנו נמשיך</button>
+                            <button class="option-button" id="editBtn">רוצה לערוך משהו</button>
+                        </div>
+                    `;
+
+                    document.getElementById('continueBtn').addEventListener('click', () => {
+                        if (this.isProcessing) return;
+                        this.addMessage('הכל נראה טוב, בואנו נמשיך', true);
+                        this.nextStep();
+                    });
+
+                    document.getElementById('editBtn').addEventListener('click', () => {
+                        this.addMessage('רוצה לערוך משהו', true);
+                        this.addMessage('בשלב זה זה לא זמין עדיין - נמשיך לשלב הבא');
+                        setTimeout(() => this.nextStep(), 1000);
+                    });
+                }, 500);
+
+            } catch (error) {
+                this.addMessage('שגיאה בטעינת סיכום הפרופיל');
+            }
+        }
+
+        generateProfileSummary() {
+            const summary = {};
+
+            Object.entries(this.temporaryData).forEach(([step, data]) => {
+                const stepNum = parseInt(step);
+                switch (stepNum) {
+                    case 3:
+                        summary.degree = data.response;
+                        break;
+                    case 4:
+                        summary.year = data.response;
+                        break;
+                    case 5:
+                        summary.field = data.response;
+                        break;
+                    case 6:
+                        summary.institution = data.response;
+                        break;
+                    case 7:
+                        summary.gpa = data.response;
+                        break;
+                    case 9:
+                        summary.experience = data.response;
+                        break;
+                    case 11:
+                        summary.location = data.response;
+                        break;
+                    case 12:
+                        summary.workHours = data.response;
+                        break;
+                    case 14:
+                        summary.personalStatement = data.response;
+                        break;
+                    case 16:
+                        summary.links = data.additionalData;
+                        break;
+                }
+            });
+
+            return summary;
+        }
+
+        formatProfileSummary(profile) {
+            let summary = "📋 **סיכום הפרופיל שלך:**\n\n";
+
+            if (this.parsedData) {
+                summary += `👤 **פרטים אישיים:**\n`;
+                summary += `• שם: ${this.parsedData.name || 'לא הוזן'}\n`;
+                summary += `• אימייל: ${this.parsedData.email || 'לא הוזן'}\n`;
+                summary += `• טלפון: ${this.parsedData.phone || 'לא הוזן'}\n\n`;
+            }
+
+            if (profile.degree || profile.field || profile.institution) {
+                summary += `🎓 **השכלה:**\n`;
+                if (profile.degree) summary += `• סוג לימודים: ${profile.degree}\n`;
+                if (profile.year) summary += `• שנה: ${profile.year}\n`;
+                if (profile.field) summary += `• תחום: ${profile.field}\n`;
+                if (profile.institution) summary += `• מוסד: ${profile.institution}\n`;
+                if (profile.gpa) summary += `• ממוצע: ${profile.gpa}\n`;
+                summary += `\n`;
+            }
+
+            if (profile.location || profile.workHours) {
+                summary += `💼 **העדפות עבודה:**\n`;
+                if (profile.location) summary += `• מיקום: ${profile.location}\n`;
+                if (profile.workHours) summary += `• היקף משרה: ${profile.workHours}\n`;
+                summary += `\n`;
+            }
+
+            if (profile.personalStatement) {
+                summary += `💬 **אישי:** ${profile.personalStatement.substring(0, 100)}...\n\n`;
+            }
+
+            return summary;
+        }
+
+        async handleFileUpload(file, uploadType) {
+            this.addMessage(`העליתי קובץ: ${file.name}`, true);
+            this.showTyping();
+            this.setLoadingState(true);
+
+            try {
+                const formData = new FormData();
+                formData.append(uploadType, file);
+
+                const endpoint = uploadType === 'cv' ?
+                    `${this.apiBase}/chat/${this.sessionId}/upload-cv` :
+                    `${this.apiBase}/chat/${this.sessionId}/upload-transcript`;
+
+                console.log('Uploading file to:', endpoint);
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                this.hideTyping();
+                this.setLoadingState(false);
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Upload failed');
+                }
+
+                if (uploadType === 'cv') {
+                    console.log('CV parsed successfully:', data);
+
+                    // Handle existing user scenario
+                    if (data.existingUser) {
+                        this.existingUserData = data.existingUser;
+                        this.addMessage(`נמצא פרופיל קיים עבור ${data.existingUser.name}. האם ברצונך לעדכן אותו או ליצור חדש?`);
+                        this.renderVerification();
+                        return;
+                    }
+
+                    // Save parsed data
+                    this.parsedData = data.parsedData;
+                    console.log('Parsed data saved:', this.parsedData);
+
+                    // Show confidence if available
+                    if (data.confidence) {
+                        const confStr = Object.entries(data.confidence)
+                            .map(([field, conf]) => `${field}: ${Math.round(conf * 100)}%`)
+                            .join(', ');
+                        console.log('Parsing confidence:', confStr);
+                    }
+
+                    this.addMessage('הקובץ עובד בהצלחה! נתונים שחולצו מהקובץ...');
+
+                    // Move to verification step
+                    this.currentStep = 2;
+                    this.updateProgress();
+                    setTimeout(() => this.renderVerification(), 1000);
+
+                } else if (uploadType === 'transcript') {
+                    this.addMessage('גליון הציונים נשמר בהצלחה!');
+                    this.nextStep();
+                }
+
+            } catch (error) {
+                this.hideTyping();
+                this.setLoadingState(false);
+                console.error('File upload error:', error);
+                this.addMessage('שגיאה בהעלאת הקובץ: ' + error.message);
+
+                // Re-render the current step on error
+                this.renderCurrentStep();
+            }
+        }
+    }
+
+    // Initialize chat when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        new StudentProfileChat();
+    });
+</script>
+</body>
+</html>

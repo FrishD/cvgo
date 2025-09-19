@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כניסה למערכת - TalentMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #2563eb;
+            --muted: #6a7681;
+            --success: #10b981;
+            --success-light: #d1fae5;
+        }
+
+        body {
+            font-family: "Assistant", sans-serif;
+        }
+
+        .font-hebrew { font-family: 'Assistant', sans-serif; }
+        .font-english { font-family: 'Assistant', sans-serif; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+        .glass-card {
+            backdrop-filter: blur(16px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(37,99,235,0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .form-input {
+            transition: all 0.3s ease;
+            border: 2px solid #e1e5e9;
+            background: rgba(255,255,255,0.8);
+            border-radius: 18px;
+            padding: 12px 16px;
+        }
+
+        .form-input:focus {
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: #2563eb;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+            border-color: #2563eb;
+            outline: none;
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 50;
+        }
+
+        [dir="ltr"] .lang-toggle { left: auto; right: 1rem; }
+
+        .error, .success, .lock-warning {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .error {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .success {
+            color: var(--success);
+            background: var(--success-light);
+            border: 1px solid #a7f3d0;
+        }
+
+        .lock-warning {
+            background: #fef3cd;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.05"/><circle cx="90" cy="20" r="0.5" fill="white" opacity="0.03"/><circle cx="30" cy="80" r="1.5" fill="white" opacity="0.04"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .flag-he { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMjAgMTYwIj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHdpZHRoPSIyMjAiIGhlaWdodD0iMjAiIHk9IjIwIiBmaWxsPSIjMDA1N2I3Ii8+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMCIgeT0iMTIwIiBmaWxsPSIjMDA1N2I3Ii8+PHBvbHlnb24gcG9pbnRzPSIxMTAsNjAgMTMwLDgwIDExMCwxMDAgOTAsODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwNTdiNyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBvbHlnb24gcG9pbnRzPSIxMTAsNzAgMTIwLDgwIDExMCw5MCA5OSw4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDA1N2I3IiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4='); }
+
+        .flag-en { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDA1MmI0Ii8+PHBhdGggZD0iIDAgMCBMIDYwIDMwIE0gMCAzMCBMIDYwIDAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iIDAgMCBMIDYwIDMwIE0gMCAzMCBMIDYwIDAiIHN0cm9rZT0iI2QwMDIxYiIgc3Ryb2tlLXdpZHRoPSIyLjQiLz48cGF0aCBkPSJtIDMwIDAgdiAzMCBtIC0zMCAtMTUgaCA2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjUiLz48cGF0aCBkPSJtIDMwIDAgdiAzMCBtIC0zMCAtMTUgaCA2MCIgc3Ryb2tlPSIjZDAwMjFiIiBzdHJva2Utd2lkdGg9IjMiLz48L3N2Zz4='); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .glass-card { margin: 16px; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen font-hebrew">
+<!-- Header -->
+<header class="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 text-[#2563eb]">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">TalentMatch</h1>
+        </div>
+        <a href="/" class="text-[#2563eb] hover:text-[#1d4ed8] font-medium transition-colors">← חזרה לדף הבית</a>
+    </div>
+</header>
+
+<!-- Language Toggle -->
+<div class="lang-toggle">
+    <button onclick="toggleLanguage()" class="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-white transition-all duration-200 border border-gray-200 shadow-sm flex items-center gap-2">
+        <div id="flagIcon" class="flag-icon flag-en"></div>
+        <span id="langText">English</span>
+    </button>
+</div>
+
+<div class="min-h-screen flex">
+    <!-- Left side - Hero Illustration -->
+    <div class="hero-bg w-1/2 flex items-center justify-center relative">
+        <div class="w-full h-full flex items-center justify-center p-8 relative z-10">
+            <svg class="w-full h-full max-w-2xl max-h-2xl animate-float" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2563eb;stop-opacity:0.1" />
+                        <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:0.2" />
+                    </linearGradient>
+                    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+                        <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.8" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <rect width="500" height="400" fill="url(#bgGradient)"/>
+
+                <!-- Login interface mockup -->
+                <rect x="100" y="80" width="300" height="240" rx="16" fill="url(#cardGradient)" stroke="rgba(255,255,255,0.4)" stroke-width="2" filter="url(#glow)"/>
+
+                <!-- Header section -->
+                <rect x="120" y="100" width="260" height="50" rx="8" fill="rgba(37,99,235,0.1)"/>
+
+                <!-- Profile icon -->
+                <circle cx="160" cy="125" r="20" fill="#2563eb" opacity="0.8" class="animate-pulse-glow"/>
+                <circle cx="160" cy="125" r="12" fill="white"/>
+                <circle cx="160" cy="120" r="4" fill="#2563eb"/>
+                <path d="M 150 132 Q 160 128 170 132" stroke="#2563eb" stroke-width="2" fill="none"/>
+
+                <!-- Form fields -->
+                <rect x="130" y="170" width="240" height="25" rx="6" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+                <rect x="130" y="205" width="240" height="25" rx="6" fill="rgba(255,255,255,0.9)" stroke="#e1e5e9" stroke-width="1"/>
+
+                <!-- Login button -->
+                <rect x="130" y="250" width="240" height="35" rx="8" fill="#2563eb"/>
+
+                <!-- Decorative elements -->
+                <circle cx="80" cy="150" r="25" fill="rgba(37,99,235,0.2)" class="animate-float" style="animation-delay: -2s;"/>
+                <circle cx="420" cy="220" r="30" fill="rgba(29,78,216,0.2)" class="animate-float" style="animation-delay: -4s;"/>
+
+                <!-- Floating geometric shapes -->
+                <rect x="60" y="100" width="15" height="15" rx="3" fill="rgba(255,255,255,0.3)" class="animate-pulse-glow"/>
+                <circle cx="450" cy="120" r="8" fill="rgba(255,255,255,0.3)"/>
+                <polygon points="40,350 55,330 70,350" fill="rgba(255,255,255,0.2)" class="animate-float"/>
+
+                <!-- Connection lines -->
+                <path d="M 105 165 Q 120 155 135 165" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
+                <path d="M 365 185 Q 380 175 395 185" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
+
+                <!-- Status indicators -->
+                <circle cx="360" cy="120" r="4" fill="#10b981" class="animate-pulse-glow"/>
+                <circle cx="340" cy="180" r="3" fill="#f59e0b"/>
+                <circle cx="350" cy="240" r="3" fill="#ef4444"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Right side - Login Form -->
+    <div class="w-1/2 flex items-center justify-center">
+        <div class="w-full max-w-2xl px-16">
+            <div class="glass-card p-16 rounded-2xl min-h-[600px]">
+                <h2 class="text-right text-5xl font-bold mb-6 -mt-4" style="color: var(--accent);"
+                    data-he="כניסה למערכת" data-en="Login">
+                    כניסה למערכת
+                </h2>
+
+                <p class="text-right text-gray-510 text-xl mb-10 -mt-1"
+                   data-he="ברוכים השבים! היכנסו לחשבונכם" data-en="Welcome back! Please sign in to your account">
+                    ברוכים השבים! היכנסו לחשבונכם
+                </p>
+
+                <!-- Messages -->
+                <div class="mb-6">
+                    <div id="errorMessage" class="error" style="display: none;"></div>
+                    <div id="lockWarning" class="lock-warning" style="display: none;"></div>
+                    <div id="successMessage" class="success" style="display: none;"></div>
+                </div>
+
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--muted);" data-he="שם משתמש" data-en="Username or Email">שם משתמש</label>
+                        <input id="username" name="username" class="form-input w-full text-lg" type="text" placeholder="" required autocomplete="username">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-medium" style="color: var(--muted);" data-he="סיסמה" data-en="Password">סיסמה</label>
+                            <a class="text-xs font-semibold hover:opacity-80 cursor-pointer transition-opacity" style="color: var(--accent);" data-he="שכחת סיסמה?" data-en="Forgot Password?">שכחת סיסמה?</a>
+                        </div>
+                        <input id="password" name="password" class="form-input w-full text-lg" type="password" placeholder="" required autocomplete="current-password">
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="btn-primary w-full py-4 px-6 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-lg" id="loginBtn">
+                            <span class="loading" id="loadingSpinner" style="display: none;">
+                                <span class="loading-spinner ml-2"></span>
+                                <span data-he="מתחבר..." data-en="Logging in...">מתחבר...</span>
+                            </span>
+                            <span id="loginText" data-he="כניסה למערכת" data-en="Sign In">כניסה למערכת</span>
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-8 text-sm font-medium text-center" style="color: var(--muted);">
+                    <span data-he="עדיין לא רשומים?" data-en="Don't have an account?">עדיין לא רשומים?</span>
+                    <a href="register.html" class="cursor-pointer hover:opacity-80 transition-opacity font-semibold" style="color: var(--accent);" data-he="הרשמה" data-en="Sign up">הרשמה</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'he';
+    const form = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const loginText = document.getElementById('loginText');
+    const errorMessage = document.getElementById('errorMessage');
+    const lockWarning = document.getElementById('lockWarning');
+    const successMessage = document.getElementById('successMessage');
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'he' ? 'en' : 'he';
+        const html = document.documentElement;
+        const langText = document.getElementById('langText');
+        const flagIcon = document.getElementById('flagIcon');
+
+        if (currentLang === 'en') {
+            html.setAttribute('lang', 'en');
+            html.setAttribute('dir', 'ltr');
+            html.classList.remove('font-hebrew');
+            html.classList.add('font-english');
+            langText.textContent = 'עברית';
+            flagIcon.className = 'flag-icon flag-he';
+            document.title = 'Login - TalentMatch';
+        } else {
+            html.setAttribute('lang', 'he');
+            html.setAttribute('dir', 'rtl');
+            html.classList.remove('font-english');
+            html.classList.add('font-hebrew');
+            langText.textContent = 'English';
+            flagIcon.className = 'flag-icon flag-en';
+            document.title = 'כניסה למערכת - TalentMatch';
+        }
+
+        document.querySelectorAll('[data-he][data-en]').forEach(element => {
+            element.textContent = element.getAttribute(`data-${currentLang}`);
+        });
+    }
+
+    function isTokenExpired() {
+        const token = localStorage.getItem('authToken');
+        if (!token) return true;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 < Date.now();
+        } catch {
+            return true;
+        }
+    }
+
+    if (localStorage.getItem('authToken') && !isTokenExpired()) {
+        window.location.href = '/dashboard.html';
+
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        errorMessage.style.display = 'none';
+        lockWarning.style.display = 'none';
+        successMessage.style.display = 'none';
+
+        loginBtn.disabled = true;
+        loadingSpinner.style.display = 'inline-flex';
+        loginText.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('authToken', result.token);
+                localStorage.setItem('userData', JSON.stringify(result.user));
+
+                successMessage.textContent = currentLang === 'he' ? 'התחברות בוצעה בהצלחה! מעביר אותך למערכת...' : 'Login successful! Redirecting...';
+                successMessage.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 1500);
+
+            } else {
+                if (response.status === 423) {
+                    lockWarning.textContent = currentLang === 'he' ?
+                        'החשבון נחסם זמנית עקב ניסיונות התחברות כושלים. נסה שוב בעוד 30 דקות.' :
+                        'Account temporarily locked due to failed login attempts. Try again in 30 minutes.';
+                    lockWarning.style.display = 'block';
+                } else if (response.status === 403) {
+                    errorMessage.textContent = currentLang === 'he' ?
+                        'החשבון עדיין ממתין לאישור מנהל המערכת.' :
+                        'Account is still pending system administrator approval.';
+                    errorMessage.style.display = 'block';
+                } else {
+                    errorMessage.textContent = result.error || (currentLang === 'he' ? 'שגיאה בהתחברות' : 'Login error');
+                    errorMessage.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            errorMessage.textContent = currentLang === 'he' ? 'שגיאה בחיבור לשרת. אנא נסה שוב.' : 'Server connection error. Please try again.';
+            errorMessage.style.display = 'block';
+        } finally {
+            loginBtn.disabled = false;
+            loadingSpinner.style.display = 'none';
+            loginText.style.display = 'inline';
+        }
+    });
+</script>
+</body>
+</html>

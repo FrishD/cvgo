@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פאנל אדמין - TalentMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-approve { background: #10b981; color: white; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-reject { background: #ef4444; color: white; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-approve:hover { background: #059669; }
+        .btn-reject:hover { background: #dc2626; }
+        .status-pending { color: #f59e0b; font-weight: bold; }
+        .status-approved { color: #10b981; font-weight: bold; }
+        .status-rejected { color: #ef4444; font-weight: bold; }
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body class="bg-gray-100">
+<!-- Header -->
+<header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900">פאנל ניהול - TalentMatch</h1>
+            <div class="flex items-center space-x-4">
+                <span id="adminName" class="text-gray-600"></span>
+                <button onclick="logout()" class="text-red-600 hover:text-red-800">התנתק</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">בקשות ממתינות</h3>
+            <p class="text-3xl font-bold text-yellow-600" id="pendingCount">0</p>
+        </div>
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">אושרו היום</h3>
+            <p class="text-3xl font-bold text-green-600" id="approvedToday">0</p>
+        </div>
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">סה"כ משתמשים</h3>
+            <p class="text-3xl font-bold text-blue-600" id="totalUsers">0</p>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div id="alertMessage" class="hidden mb-4 p-4 rounded-lg"></div>
+
+    <!-- Pending Registrations -->
+    <div class="card">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-gray-800">בקשות הרשמה ממתينות</h2>
+                <button onclick="refreshData()" class="text-blue-600 hover:text-blue-800">
+                    🔄 רענן
+                </button>
+            </div>
+        </div>
+
+        <div id="loadingSpinner" class="p-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-2 text-gray-600">טוען נתונים...</p>
+        </div>
+
+        <div id="pendingUsers" class="divide-y divide-gray-200">
+            <!-- Pending users will be loaded here -->
+        </div>
+
+        <div id="noUsers" class="p-8 text-center text-gray-500" style="display: none;">
+            אין בקשות הרשמה ממתינות
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentToken = localStorage.getItem('authToken');
+
+    // Check admin authentication
+    function checkAuth() {
+        if (!currentToken) {
+            window.location.href = '/login.html';
+            return false;
+        }
+
+        try {
+            const payload = JSON.parse(atob(currentToken.split('.')[1]));
+            if (payload.exp * 1000 < Date.now()) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userData');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            // Check if user is admin
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            if (!userData || userData.role !== 'admin') {
+
+                alert('Access denied - Admin privileges required');
+                window.location.href = '/candidates.html';
+                return false;
+            }
+
+            document.getElementById('adminName').textContent = userData.fullName;
+            return true;
+        } catch (error) {
+            console.error('Auth error:', error);
+            window.location.href = '/login.html';
+            return false;
+        }
+    }
+
+    // Show alert message
+    function showAlert(message, type = 'info') {
+        const alertEl = document.getElementById('alertMessage');
+        alertEl.className = `mb-4 p-4 rounded-lg ${
+            type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                    'bg-blue-100 text-blue-800 border border-blue-200'
+        }`;
+        alertEl.textContent = message;
+        alertEl.classList.remove('hidden');
+
+        setTimeout(() => {
+            alertEl.classList.add('hidden');
+        }, 5000);
+    }
+
+    // Load pending users
+    async function loadPendingUsers() {
+        if (!checkAuth()) return;
+
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const pendingUsers = document.getElementById('pendingUsers');
+        const noUsers = document.getElementById('noUsers');
+
+        loadingSpinner.style.display = 'block';
+        pendingUsers.innerHTML = '';
+        noUsers.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/admin/pending-users', {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to load data');
+            }
+
+            const users = await response.json();
+            loadingSpinner.style.display = 'none';
+
+            if (users.length === 0) {
+                noUsers.style.display = 'block';
+                document.getElementById('pendingCount').textContent = '0';
+                return;
+            }
+
+            document.getElementById('pendingCount').textContent = users.length;
+            await loadFavoriteStudents();
+
+            users.forEach(user => {
+                const userCard = createUserCard(user);
+                pendingUsers.appendChild(userCard);
+            });
+
+        } catch (error) {
+            console.error('Error loading users:', error);
+            loadingSpinner.style.display = 'none';
+            showAlert('שגיאה בטעינת הנתונים', 'error');
+        }
+    }
+
+    // Create user card
+    function createUserCard(user) {
+        const div = document.createElement('div');
+        div.className = 'p-6';
+        div.id = `user-${user._id}`;
+
+        div.innerHTML = `
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between">
+                    <div class="flex-1 mb-4 lg:mb-0">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <h3 class="font-semibold text-lg text-gray-900">${user.fullName}</h3>
+                                <p class="text-gray-600">${user.position}</p>
+                                <p class="text-sm text-gray-500">${user.companyName}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600"><strong>אימייל:</strong> ${user.email}</p>
+                                <p class="text-sm text-gray-600"><strong>טלפון:</strong> ${user.phone}</p>
+                                <p class="text-sm text-gray-600"><strong>עיר:</strong> ${user.city}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600"><strong>איזורים:</strong> ${user.regions.join(', ')}</p>
+                                <p class="text-sm text-gray-600"><strong>תאריך הגשה:</strong> ${new Date(user.createdAt).toLocaleDateString('he-IL')}</p>
+                                <p class="text-sm text-gray-600"><strong>שם משתמש:</strong> ${user.username}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <p class="text-sm text-gray-600"><strong>תיאור החברה:</strong></p>
+                            <p class="text-sm text-gray-700">${user.companyDescription}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 lg:space-x-0 lg:space-y-2 lg:flex-col">
+                        <button onclick="approveUser('${user._id}')" 
+                                class="btn-approve whitespace-nowrap">
+                            ✓ אשר
+                        </button>
+                        <button onclick="rejectUser('${user._id}')" 
+                                class="btn-reject whitespace-nowrap">
+                            ✗ דחה
+                        </button>
+                    </div>
+                </div>
+            `;
+
+        return div;
+    }
+
+    // Approve user
+    async function approveUser(userId) {
+        if (!confirm('האם אתה בטוח שברצונך לאשר את המשתמש?')) return;
+
+        const userCard = document.getElementById(`user-${userId}`);
+        userCard.classList.add('loading');
+
+        try {
+            const response = await fetch(`/api/admin/approve-user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'approve' })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                userCard.remove();
+                showAlert('המשתמש אושר בהצלחה ונשלח אליו אימייל', 'success');
+                updateStats();
+            } else {
+                throw new Error(result.error || 'Failed to approve');
+            }
+
+        } catch (error) {
+            console.error('Error approving user:', error);
+            userCard.classList.remove('loading');
+            showAlert('שגיאה באישור המשתמש', 'error');
+        }
+    }
+
+    // Reject user
+    async function rejectUser(userId) {
+        if (!confirm('האם אתה בטוח שברצונך לדחות את המשתמש?')) return;
+
+        const userCard = document.getElementById(`user-${userId}`);
+        userCard.classList.add('loading');
+
+        try {
+            const response = await fetch(`/api/admin/approve-user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'reject' })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                userCard.remove();
+                showAlert('המשתמש נדחה ונשלח אליו אימייל', 'success');
+                updateStats();
+            } else {
+                throw new Error(result.error || 'Failed to reject');
+            }
+
+        } catch (error) {
+            console.error('Error rejecting user:', error);
+            userCard.classList.remove('loading');
+            showAlert('שגיאה בדחיית המשתמש', 'error');
+        }
+    }
+
+    // Update statistics
+    function updateStats() {
+        const pendingCount = document.querySelectorAll('#pendingUsers > div').length;
+        document.getElementById('pendingCount').textContent = pendingCount;
+
+        if (pendingCount === 0) {
+            document.getElementById('noUsers').style.display = 'block';
+        }
+    }
+
+    // Refresh data
+    function refreshData() {
+        loadPendingUsers();
+    }
+
+    // Logout
+    function logout() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        window.location.href = '/login.html';
+    }
+
+    // Initialize
+    window.addEventListener('load', function() {
+        if (checkAuth()) {
+            loadPendingUsers();
+        }
+    });
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        if (document.visibilityState === 'visible') {
+            loadPendingUsers();
+        }
+    }, 30000);
+</script>
+</body>
+</html>

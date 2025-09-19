@@ -1,0 +1,26 @@
+@media print {
+    body {
+        background-color: #fff;
+        color: #000;
+    }
+
+    .header_container__X86zB,
+    .footer_footer__FiYd5,
+    .download-pdf-button {
+        display: none !important;
+    }
+
+    .policy-container {
+        margin: 1rem;
+        padding: 0;
+        color: #000;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .policy-container h1,
+    .policy-container h2,
+    .policy-container p {
+        color: #000 !important;
+    }
+}

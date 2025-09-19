@@ -1,0 +1,29 @@
+body {
+  direction: rtl;
+  text-align: right;
+}
+
+.header_jumpLinks__GASkm {
+  left: unset;
+  right: -10rem;
+}
+
+.header_navContainer__6afui {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.button-more-dropdown_dropdownContainer__s0SG9 {
+  left: unset;
+  right: 0;
+}
+
+.gallery_gallery__gccP0 .gallery_items__s42jn {
+  padding-left: 1.6rem;
+  padding-right: 1.6rem;
+}
+
+.footer_socialIcons__2_3_4 {
+  margin-right: 0;
+  margin-left: auto;
+}
