@@ -14,15 +14,18 @@ const helmetConfig = {
                 "'unsafe-inline'",
                 "https://cdnjs.cloudflare.com",
                 "https://unpkg.com",
-                "https://cdn.tailwindcss.com"
+                "https://cdn.tailwindcss.com",
+                "https://cdn.jsdelivr.net"
             ],
             styleSrc: [
                 "'self'",
                 "'unsafe-inline'",
                 "https://fonts.googleapis.com",
-                "https://fonts.gstatic.com"
+                "https://fonts.gstatic.com",
+                "https://cdn.jsdelivr.net",
+                "https://cdnjs.cloudflare.com"
             ],
-            fontSrc: ["'self'", "https:"],
+            fontSrc: ["'self'", "https:", "data:"],
             imgSrc: ["'self'", "data:", "https:"],
             connectSrc: ["'self'"]
         }
