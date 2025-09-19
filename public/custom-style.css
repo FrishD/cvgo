@@ -150,8 +150,8 @@ html, body {
     opacity: 0;
     transform: scale(0.5);
     animation:
-        pulseAndFade 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
-        subtle-glow 4s ease-in-out infinite 1.5s; /* Start after pulseAndFade */
+            pulseAndFade 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+            subtle-glow 4s ease-in-out infinite 1.5s; /* Start after pulseAndFade */
     text-shadow: 0 0 8px rgba(255, 255, 255, 0); /* Initial shadow */
 }
 
@@ -177,13 +177,13 @@ html, body {
 @keyframes subtle-glow {
     0%, 100% {
         text-shadow:
-            0 0 8px rgba(255, 255, 255, 0.3),
-            0 0 16px rgba(103, 232, 249, 0.2);
+                0 0 8px rgba(255, 255, 255, 0.3),
+                0 0 16px rgba(103, 232, 249, 0.2);
     }
     50% {
         text-shadow:
-            0 0 16px rgba(255, 255, 255, 0.5),
-            0 0 32px rgba(103, 232, 249, 0.4);
+                0 0 16px rgba(255, 255, 255, 0.5),
+                0 0 32px rgba(103, 232, 249, 0.4);
     }
 }
 
@@ -255,10 +255,10 @@ html, body {
     width: 200%;
     height: 200%;
     background: linear-gradient(
-        115deg,
-        rgba(10, 25, 47, 0) 40%,
-        rgba(54, 124, 255, 0.1) 50%,
-        rgba(10, 25, 47, 0) 60%
+            115deg,
+            rgba(10, 25, 47, 0) 40%,
+            rgba(54, 124, 255, 0.1) 50%,
+            rgba(10, 25, 47, 0) 60%
     );
     z-index: 0;
     animation: animated-gradient 12s linear infinite;
@@ -322,8 +322,8 @@ html, body {
     border: 1px solid transparent;
     background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.3) 100%) border-box;
     -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -592,87 +592,17 @@ html, body {
     background-color: var(--primary-light-blue);
 }
 
-/* --- Verification Page Styles --- */
-
-.verify-main {
-    padding: 6rem 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 144px); /* Full height minus header/footer */
-}
-
-#verify-section {
-    width: 100%;
-}
-
-.verify-form-container {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 3rem;
-
-    /* Glassmorphism Effect */
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--text-gray);
-    margin-bottom: 0.8rem;
-}
-
-.form-group input,
-.form-group select {
-    background: rgba(10, 25, 47, 0.7); /* Darker input background */
-    border: 1px solid rgba(255, 255, 255, 0.2);
+/* --- Upload Error Message on Homepage --- */
+.upload-error-message {
+    color: #f87171; /* Light red for dark theme */
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 1rem;
     border-radius: 8px;
-    padding: 1.2rem 1.5rem;
-    font-size: 1.6rem;
-    color: var(--text-light);
-    transition: all 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.2);
-}
-
-.form-group select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2367E8F9' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: left 1rem center;
-    background-repeat: no-repeat;
-    background-size: 1.6rem 1.6rem;
-    padding-left: 4rem; /* Make space for arrow */
-}
-
-.form-actions {
-    margin-top: 4rem;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.form-actions button {
-    font-size: 1.8rem;
-    padding: 1.2rem 3rem;
+    margin-top: 1.5rem;
+    max-width: 600px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 500;
 }

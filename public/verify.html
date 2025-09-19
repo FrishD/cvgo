@@ -1,130 +1,1249 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>אימות פרטים - Flow</title>
-    <meta name="description" content="אמת את הפרטים שחולצו מקורות החיים שלך." />
-    <link rel="icon" href="about/favicon-96x96.png" sizes="96x96" type="image/png" />
-    <link rel="icon" href="about/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="about/apple-touch-icon.png" type="image/png" sizes="180x180" />
-    <link rel="preconnect" href="https://fonts.googleapis.com/" crossorigin="anonymous" />
-    <link rel="preconnect" href="https://fonts.gstatic.com/" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>אימות פרטים - CVGo</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
     <link href="https://fonts.googleapis.com/css?family=Google+Sans:400|Google+Symbols|Google+Sans+Text:400&amp;display=swap&amp;lang=en" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="custom-style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <style>
+        :root {
+            --accent: #2d608f;
+            --muted: #94A3B8;
+            --success: #10b981;
+            --success-light: #d1fae5;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Assistant', sans-serif;
+        }
+        /* From Uiverse.io by mobinkakei */
+        #wifi-loader {
+            --background: #62abff;
+            --front-color: #4f29f0;
+            --back-color: #c3c8de;
+            --text-color: #414856;
+            width: 64px;
+            height: 64px;
+            border-radius: 50px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(45,96,143,0.95), rgba(98,171,255,0.95));
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #wifi-loader svg {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #wifi-loader svg circle {
+            position: absolute;
+            fill: none;
+            stroke-width: 6px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: rotate(-100deg);
+            transform-origin: center;
+        }
+
+        #wifi-loader svg circle.back {
+            stroke: var(--back-color);
+        }
+
+        #wifi-loader svg circle.front {
+            stroke: var(--front-color);
+        }
+
+        #wifi-loader svg.circle-outer {
+            height: 86px;
+            width: 86px;
+        }
+
+        #wifi-loader svg.circle-outer circle {
+            stroke-dasharray: 62.75 188.25;
+        }
+
+        #wifi-loader svg.circle-outer circle.back {
+            animation: circle-outer135 1.8s ease infinite 0.3s;
+        }
+
+        #wifi-loader svg.circle-outer circle.front {
+            animation: circle-outer135 1.8s ease infinite 0.15s;
+        }
+
+        #wifi-loader svg.circle-middle {
+            height: 60px;
+            width: 60px;
+        }
+
+        #wifi-loader svg.circle-middle circle {
+            stroke-dasharray: 42.5 127.5;
+        }
+
+        #wifi-loader svg.circle-middle circle.back {
+            animation: circle-middle6123 1.8s ease infinite 0.25s;
+        }
+
+        #wifi-loader svg.circle-middle circle.front {
+            animation: circle-middle6123 1.8s ease infinite 0.1s;
+        }
+
+        #wifi-loader svg.circle-inner {
+            height: 34px;
+            width: 34px;
+        }
+
+        #wifi-loader svg.circle-inner circle {
+            stroke-dasharray: 22 66;
+        }
+
+        #wifi-loader svg.circle-inner circle.back {
+            animation: circle-inner162 1.8s ease infinite 0.2s;
+        }
+
+        #wifi-loader svg.circle-inner circle.front {
+            animation: circle-inner162 1.8s ease infinite 0.05s;
+        }
+
+        #wifi-loader .text {
+            position: absolute;
+            bottom: -40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: lowercase;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+        }
+
+        #wifi-loader .text::before, #wifi-loader .text::after {
+            content: attr(data-text);
+        }
+
+        #wifi-loader .text::before {
+            color: var(--text-color);
+        }
+
+        #wifi-loader .text::after {
+            color: var(--front-color);
+            animation: text-animation76 3.6s ease infinite;
+            position: absolute;
+            left: 0;
+        }
+
+        @keyframes circle-outer135 {
+            0% {
+                stroke-dashoffset: 25;
+            }
+
+            25% {
+                stroke-dashoffset: 0;
+            }
+
+            65% {
+                stroke-dashoffset: 301;
+            }
+
+            80% {
+                stroke-dashoffset: 276;
+            }
+
+            100% {
+                stroke-dashoffset: 276;
+            }
+        }
+
+        @keyframes circle-middle6123 {
+            0% {
+                stroke-dashoffset: 17;
+            }
+
+            25% {
+                stroke-dashoffset: 0;
+            }
+
+            65% {
+                stroke-dashoffset: 204;
+            }
+
+            80% {
+                stroke-dashoffset: 187;
+            }
+
+            100% {
+                stroke-dashoffset: 187;
+            }
+        }
+
+        @keyframes circle-inner162 {
+            0% {
+                stroke-dashoffset: 9;
+            }
+
+            25% {
+                stroke-dashoffset: 0;
+            }
+
+            65% {
+                stroke-dashoffset: 106;
+            }
+
+            80% {
+                stroke-dashoffset: 97;
+            }
+
+            100% {
+                stroke-dashoffset: 97;
+            }
+        }
+
+        @keyframes text-animation76 {
+            0% {
+                clip-path: inset(0 100% 0 0);
+            }
+
+            50% {
+                clip-path: inset(0);
+            }
+
+            100% {
+                clip-path: inset(0 0 0 100%);
+            }
+        }
+
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(45,96,143,0.2); }
+            50% { box-shadow: 0 0 30px rgba(45,96,143,0.4); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .anim-fade { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+        .anim-slide { animation: slideInLeft 0.6s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #f1f3f5 0%, #e1e5e9 100%);
+            border-radius: 12px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #4b7bb4 50%, var(--accent) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s ease-in-out infinite;
+            border-radius: 12px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card {
+            backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #4b7bb4 100%);
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45,96,143,0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(45,96,143,0.1);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .form-input {
+            transition: all 0.3s ease;
+            border: 2px solid #e1e5e9;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(45,96,143,0.1);
+            outline: none;
+        }
+
+        .job-tag {
+            background: linear-gradient(135deg, rgba(45,96,143,0.1) 0%, rgba(75,123,180,0.1) 100%);
+            border: 1px solid rgba(45,96,143,0.2);
+            color: var(--accent);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .job-tag:hover {
+            background: linear-gradient(135deg, var(--accent) 0%, #4b7bb4 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .job-tag.selected {
+            background: linear-gradient(135deg, var(--accent) 0%, #4b7bb4 100%);
+            color: white;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        .step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator.active {
+            background: var(--accent);
+            color: white;
+            animation: pulseGlow 1.5s ease-in-out infinite;
+        }
+
+        .step-indicator.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-indicator.inactive {
+            background: #f1f3f5;
+            color: var(--muted);
+        }
+
+        .success-animation {
+            animation: fadeInUp 0.6s ease, pulseGlow 2s ease-in-out infinite 0.6s;
+        }
+
+        /* Custom select styling */
+        .custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px 16px;
+            padding-right: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .verification-card { margin: 16px; }
+        }
+    </style>
 </head>
 
-<body>
-    <div class="loader-wrapper hidden">
-        <span class="loader-letter">ט</span>
-        <span class="loader-letter">ו</span>
-        <span class="loader-letter">ע</span>
-        <span class="loader-letter">ן</span>
-        <span class="loader-letter">.</span>
-        <span class="loader-letter">.</span>
-        <span class="loader-letter">.</span>
-        <div class="loader"></div>
+<body class="verify-page-body min-h-screen">
+<!-- Loader -->
+<div id="loader" class="loader-wrapper hidden">
+    <span class="loader-letter">ט</span>
+    <span class="loader-letter">ו</span>
+    <span class="loader-letter">ע</span>
+    <span class="loader-letter">ן</span>
+    <span class="loader-letter">.</span>
+    <span class="loader-letter">.</span>
+    <span class="loader-letter">.</span>
+    <div class="loader"></div>
+</div>
+
+<!-- Header -->
+<header class="header_container__X86zB">
+    <div class="header_logo__AAPGq">
+        <a class="header_logoLink__HhzOO typo-flow-caption" aria-label="Home Page" href="/"><img alt="CVGo Logo" loading="eager" width="128" height="43" decoding="async" data-nimg="1" style="color:transparent" src="about/_next/google_logo5b6f.png" /></a>
     </div>
-    <span class="backdrop_backdrop__yvQg9" data-is-hidden="true"><span class="backdrop_blur__LftOu"></span><span class="backdrop_blur__LftOu"></span><span class="backdrop_blur__LftOu"></span><span class="backdrop_blur__LftOu"></span><span class="backdrop_blur__LftOu"></span>
-    <span class="backdrop_blur__LftOu"></span>
-    </span>
-    <header class="header_container__X86zB">
-        <div class="header_logo__AAPGq">
-            <a class="header_logoLink__HhzOO typo-flow-caption" aria-label="Home" href="/"><img alt="Flow Logo" loading="eager" width="128" height="43" decoding="async" data-nimg="1" style="color:transparent" src="about/_next/google_logo5b6f.png" /></a>
-        </div>
-        <div class="header_navContainer__6afui">
-             <a href="/" class="button-link_link__eTf8F">חזרה לדף הבית</a>
-        </div>
-    </header>
-    <main class="verify-main">
-        <section id="verify-section" class="spacer-text_spacerText__rY6HY">
-            <div class="spacer-text_title__GJYuW">
-                <h2 class="typo-flow-subtitle font-weight-bold">אימות הפרטים שלך</h2>
+    <div class="header_navContainer__6afui">
+        <a href="/" class="button-link_link__eTf8F">חזרה לדף הבית</a>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container max-w-4xl mx-auto py-12">
+    <!-- Progress Header -->
+    <div class="text-center mb-12 anim-fade">
+        <h2 class="text-4xl font-bold text-gray-900 mb-4">אימות פרטים</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            חילצנו את המידע הזה מקורות החיים שלך. אנא אמת את הפרטים והשלם את החסר כדי להמשיך.
+        </p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="flex items-center justify-center mb-12 anim-slide" style="animation-delay: 0.2s;">
+        <div class="flex items-center space-x-8">
+            <div class="flex items-center">
+                <div id="step1" class="step-indicator active">1</div>
+                <span class="ml-2 text-sm font-medium text-gray-700">פרטים בסיסיים</span>
             </div>
-            <div class="spacer-text_copy__cK_qp" style="margin-bottom: 4rem;">
-                <p class="typo-flow-text">הוצאנו את הפרטים האלו מקורות החיים שלך. אנא וודא שהם נכונים ותקן במידת הצורך.</p>
+            <div class="w-16 h-1 bg-gray-200 rounded-full">
+                <div id="progress1" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center">
+                <div id="step2" class="step-indicator inactive">2</div>
+                <span class="ml-2 text-sm font-medium text-gray-500">בחירת משרות</span>
+            </div>
+            <div class="w-16 h-1 bg-gray-200 rounded-full">
+                <div id="progress2" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center">
+                <div id="step3" class="step-indicator inactive">3</div>
+                <span class="ml-2 text-sm font-medium text-gray-500">סיכום ושליחה</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Form -->
+    <div class="verification-card glass-card rounded-2xl p-8 anim-fade" style="animation-delay: 0.4s;">
+        <p id="form-alert" class="form-alert" style="display: none;"></p>
+        <!-- Step 1: Basic Information -->
+        <div id="stepContent1" class="step-content">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">פרטים בסיסיים</h3>
+                <p class="text-gray-600">אנא אמת את פרטי הקשר שלך שחולצו מקורות החיים.</p>
             </div>
 
-            <form id="verify-form" class="verify-form-container">
-                <!-- Form fields will be dynamically inserted here -->
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="fullName">שם מלא</label>
-                        <input type="text" id="fullName" name="fullName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">כתובת אימייל</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">מספר טלפון</label>
-                        <input type="tel" id="phone" name="phone">
-                    </div>
-                    <div class="form-group">
-                        <label for="location">אזור מגורים</label>
-                         <select id="location" name="location" required>
-                            <option value="">בחר אזור / Select a region</option>
-                            <option value="north">צפון / North (צפונית לחדרה / north of Hadera)</option>
-                            <option value="center">מרכז / Central (הרצליה עד ראשון לציון / Herzliya to Rishon Lezion)</option>
-                            <option value="lowlands">שפלה / Lowlands (ראשון לציון עד אשקלון / Rishon Lezion to Ashkelon)</option>
-                            <option value="south">דרום / South (דרומית לאשקלון / south of Ashkelon)</option>
-                        </select>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">שם מלא</label>
+                    <input id="fullName" type="text" class="form-input w-full px-4 py-3 rounded-xl" placeholder="הכנס שם מלא">
                 </div>
-                <div class="form-actions">
-                     <button type="submit" class="button-link_link__eTf8F">שמור והמשך</button>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">כתובת אימייל</label>
+                    <input id="email" type="email" class="form-input w-full px-4 py-3 rounded-xl" placeholder="your.email@example.com">
                 </div>
-            </form>
-        </section>
-    </main>
-    <footer class="footer_footer__FiYd5">
-        <div class="footer_contentContainer__MjiW5">
-            <p class="footer_copyright__Y_F8_">© כל הזכויות שמורות לחברת CvGo</p>
-            <div class="footer_linksSection__Op_1g">
-                <a href="privacy-policy.html" class="footer_link__Tlx14">מדיניות הפרטיות</a>
-                <a href="terms-of-use.html" class="footer_link__Tlx14">מדיניות השימוש</a>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">מספר טלפון</label>
+                    <input id="phone" type="tel" class="form-input w-full px-4 py-3 rounded-xl" placeholder="050-123-4567">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">אזור מגורים *</label>
+                    <select id="location" class="form-input custom-select w-full px-4 py-3 rounded-xl bg-white" required>
+                        <option value="">בחר אזור</option>
+                        <option value="north">צפון (צפונית לחדרה)</option>
+                        <option value="center">מרכז (הרצליה עד ראשון לציון)</option>
+                        <option value="lowlands">שפלה (ראשון לציון עד אשקלון)</option>
+                        <option value="south">דרום (דרומית לאשקלון)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-8">
+                <button id="continueBtn1" class="btn-primary px-8 py-3 rounded-xl font-semibold">
+                    המשך לבחירת משרות ←
+                </button>
             </div>
         </div>
-    </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cvDataString = sessionStorage.getItem('cvData');
-            if (!cvDataString) {
-                console.error('No CV data found in sessionStorage.');
-                // Optionally, redirect back to the home page or show an error
-                // window.location.href = '/';
+        <!-- Step 2: Job Positions -->
+        <div id="stepContent2" class="step-content hidden">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">בחירת משרות</h3>
+                <p class="text-gray-600">בחר עד 4 משרות שהכי מתאימות לניסיון ולתחומי העניין שלך.</p>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">חיפוש משרה:</label>
+                <div class="relative">
+                    <input id="positionSearch" type="text" class="form-input w-full px-4 py-3 pr-10 rounded-xl" placeholder="הקלד שם משרה...">
+                    <button id="clearSearch" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="searchResults" class="mb-6 hidden relative">
+                <div class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div id="searchResultsContainer" class="p-2"></div>
+                </div>
+            </div>
+
+            <div id="relatedPositions" class="mb-6 hidden">
+                <p class="text-sm font-medium text-gray-700 mb-3">משרות קשורות:</p>
+                <div id="relatedPositionsContainer" class="flex flex-wrap gap-3"></div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-sm font-medium text-gray-700">משרות שנבחרו:</p>
+                    <span id="selectedCount" class="text-sm text-gray-500">0/4 נבחרו</span>
+                </div>
+                <div id="selectedPositions" class="min-h-[60px] p-4 border-2 border-dashed border-gray-200 rounded-xl flex flex-wrap gap-2 items-center justify-center">
+                    <p class="text-gray-400 text-sm">בחר משרות מהרשימה למעלה</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button id="backBtn1" class="btn-secondary px-6 py-3 rounded-xl font-semibold">
+                    → חזור
+                </button>
+                <button id="reviewBtn" class="btn-primary px-8 py-3 rounded-xl font-semibold opacity-50 cursor-not-allowed" disabled>
+                    המשך לסיכום ←
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Review & Submit -->
+        <div id="stepContent3" class="step-content hidden">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">סיכום ושליחה</h3>
+                <p class="text-gray-600">נא לעבור על המידע שלך לפני השליחה למאגר הנתונים שלנו.</p>
+            </div>
+
+            <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">פרטים אישיים</h4>
+                        <div class="space-y-2">
+                            <p><span class="text-gray-500">שם:</span> <span id="reviewName" class="font-medium"></span></p>
+                            <p><span class="text-gray-500">אימייל:</span> <span id="reviewEmail" class="font-medium"></span></p>
+                            <p><span class="text-gray-500">טלפון:</span> <span id="reviewPhone" class="font-medium"></span></p>
+                            <p><span class="text-gray-500">אזור:</span> <span id="reviewLocation" class="font-medium"></span></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">משרות שנבחרו</h4>
+                        <div id="reviewPositions" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input id="agreeTerms" type="checkbox" class="w-5 h-5 text-[#2d608f] border-2 border-gray-300 rounded focus:ring-[#2d608f]">
+                    <span class="text-sm text-gray-700">
+                            אני מסכים ל<a href="/privacy-policy.html" target="_blank" class="text-[#2d608f] hover:underline">מדיניות הפרטיות</a> ול<a href="/terms-of-use.html" target="_blank" class="text-[#2d608f] hover:underline">תנאי השימוש</a>
+                        </span>
+                </label>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button id="backBtn2" class="btn-secondary px-6 py-3 rounded-xl font-semibold">
+                    → חזור
+                </button>
+                <button id="submitBtn" class="btn-primary px-8 py-3 rounded-xl font-semibold opacity-50 cursor-not-allowed" disabled>
+                    שלח פנייה
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-8 max-w-md mx-4 success-animation">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">הפנייה נשלחה בהצלחה!</h3>
+            <p class="text-gray-600 mb-6">המידע שלך נוסף למאגר הכשרונות שלנו. ניצור איתך קשר כאשר יצוצו הזדמנויות רלוונטיות.</p>
+            <button id="goHomeBtn" class="btn-primary px-6 py-3 rounded-xl font-semibold w-full">
+                חזרה לדף הבית
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal is no longer used, replaced by inline #form-alert -->
+
+<script>
+    let currentStep = 1;
+    let selectedPositions = [];
+    let cvData = {};
+    const allPositions = [
+        // Administration
+        {title: "Graphics", category: "Administration", related: ["Design", "Web Designer"]},
+        {title: "Bookkeeping", category: "Administration", related: ["Payroll Accountant", "Certified Public Accountant"]},
+        {title: "Payroll Accountant", category: "Administration", related: ["Bookkeeping", "Economics"]},
+        {title: "Import and Export", category: "Administration", related: ["International Sales and Marketing", "Logistics"]},
+        {title: "Call Center", category: "Administration", related: ["Customer Service", "Phone Support"]},
+        {title: "Secretary", category: "Administration", related: ["Senior Secretary", "Office Management"]},
+        {title: "Senior Secretary", category: "Administration", related: ["Secretary", "Administration Management"]},
+        {title: "Administration Management", category: "Administration", related: ["Office Management", "Senior Secretary"]},
+        {title: "Office Management", category: "Administration", related: ["Administration Management", "Clerical Work"]},
+        {title: "Clerical Work", category: "Administration", related: ["Typing", "Office Management"]},
+        {title: "Typing", category: "Administration", related: ["Clerical Work", "Secretary"]},
+        {title: "Purchasing", category: "Administration", related: ["Import and Export", "Warehouse/Logistics"]},
+        {title: "Customer Service", category: "Administration", related: ["Call Center", "Phone Support"]},
+
+        // Electronics
+        {title: "Electro-optics", category: "Electronics", related: ["Electronics Technician", "Electronics Engineer"]},
+        {title: "Electronics Course Graduate or Experienced", category: "Electronics", related: ["Electronics Technician", "Electronics Engineer"]},
+        {title: "Electronics Technician", category: "Electronics", related: ["Electronics Engineer", "Electronics Course Graduate or Experienced"]},
+        {title: "Electronics Engineer", category: "Electronics", related: ["Electronics Technician", "System Engineer - Hardware"]},
+        {title: "System Engineer - Hardware", category: "Electronics", related: ["Electronics Engineer", "Hardware Engineer"]},
+        {title: "Hardware Engineer", category: "Electronics", related: ["System Engineer - Hardware", "Team Lead - Hardware"]},
+
+        // Computers
+        {title: "AI / ML", category: "Computers", related: ["Data Engineer/Scientist", "Big Data / BI / OLAP"]},
+        {title: "Big Data / BI / OLAP", category: "Computers", related: ["Data Engineer/Scientist", "AI / ML"]},
+        {title: "Data Engineer/Scientist", category: "Computers", related: ["AI / ML", "Big Data / BI / OLAP"]},
+        {title: "DBA", category: "Computers", related: ["System Administrator", "Information Systems"]},
+        {title: "DevOps", category: "Computers", related: ["System Administrator", "System Engineer - Software"]},
+        {title: "Help Desk", category: "Computers", related: ["PC Technician", "Phone Support"]},
+        {title: "PC Technician", category: "Computers", related: ["Help Desk", "Support Engineer"]},
+        {title: "QA / Quality Assurance", category: "Computers", related: ["Quality Control", "Software Developer"]},
+        {title: "System Administrator", category: "Computers", related: ["DevOps", "DBA"]},
+        {title: "Web Master", category: "Computers", related: ["Web Designer", "Software Developer"]},
+        {title: "Information Security", category: "Computers", related: ["System Administrator", "Computer Networking"]},
+        {title: "Algorithm Engineer", category: "Computers", related: ["Software Engineer", "AI / ML"]},
+        {title: "Computer Science Graduate/Certified", category: "Computers", related: ["Computer Technician", "Software Developer"]},
+        {title: "Computer Technician", category: "Computers", related: ["Software Engineer", "Computer Science Graduate/Certified"]},
+        {title: "Telephony", category: "Computers", related: ["Computer Networking", "Call Center"]},
+        {title: "Technical Writer", category: "Computers", related: ["Information Systems", "Systems Analysis"]},
+        {title: "Software Engineer", category: "Computers", related: ["Software Developer", "Senior Software Developer"]},
+        {title: "System Engineer - Software", category: "Computers", related: ["Software Engineer", "DevOps"]},
+        {title: "Support Engineer", category: "Computers", related: ["Help Desk", "PC Technician"]},
+        {title: "Project Manager", category: "Computers", related: ["Team Lead - Software", "Project Manager"]},
+        {title: "Web Designer", category: "Computers", related: ["Web Master", "Design"]},
+        {title: "Information Systems", category: "Computers", related: ["Systems Analysis", "DBA"]},
+        {title: "Software Developer", category: "Computers", related: ["Software Engineer", "Senior Software Developer"]},
+        {title: "Senior Software Developer", category: "Computers", related: ["Software Developer", "Team Lead - Software"]},
+        {title: "Systems Analysis", category: "Computers", related: ["Information Systems", "Technical Writer"]},
+        {title: "Mobile Development - Android / iOS", category: "Computers", related: ["Software Developer", "Web Designer"]},
+        {title: "Team Lead - Hardware", category: "Computers", related: ["Hardware Engineer", "Team Lead - Software"]},
+        {title: "Team Lead - Software", category: "Computers", related: ["Senior Software Developer", "Project Manager"]},
+        {title: "Computer Networking", category: "Computers", related: ["System Administrator", "Information Security"]},
+
+        // Additional categories
+        {title: "Senior Manager", category: "Senior Management", related: ["CEO", "VP"]},
+        {title: "Marketing", category: "Sales/Marketing/Communications", related: ["Sales", "Advertising, Public Relations, and Communications"]},
+        {title: "Teaching/Training/Education", category: "Liberal/Academic Professions", related: ["Special Education", "Psychology"]},
+        {title: "Nurses/Caregivers/Nursing", category: "General Professions", related: ["Medicine", "Social Work"]},
+    ];
+
+    const fuse = new Fuse(allPositions, {
+        keys: ['title'],
+        threshold: 0.3,
+        includeScore: true
+    });
+
+    // Event listeners setup
+    function setupEventListeners() {
+        // Navigation buttons
+        document.getElementById('continueBtn1').addEventListener('click', () => nextStep(1));
+        document.getElementById('backBtn1').addEventListener('click', () => prevStep(2));
+        document.getElementById('reviewBtn').addEventListener('click', () => nextStep(2));
+        document.getElementById('backBtn2').addEventListener('click', () => prevStep(3));
+        document.getElementById('submitBtn').addEventListener('click', submitForm);
+
+        // Modal buttons
+        document.getElementById('goHomeBtn').addEventListener('click', goHome);
+        document.getElementById('closeErrorBtn').addEventListener('click', closeErrorModal);
+
+        // Search functionality
+        document.getElementById('positionSearch').addEventListener('input', searchPositions);
+        document.getElementById('clearSearch').addEventListener('click', clearSearch);
+
+        // Form validation
+        document.getElementById('agreeTerms').addEventListener('change', toggleSubmitButton);
+
+        // Input formatting
+        setupInputFormatting();
+
+        // Click outside to close search results
+        document.addEventListener('click', handleOutsideClick);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', handleKeyNavigation);
+    }
+
+    function setupInputFormatting() {
+        // Name validation
+        document.getElementById('fullName').addEventListener('input', function() {
+            this.value = this.value.replace(/[^a-zA-Z\u0590-\u05FF\s\-\.\']/g, '');
+            saveFormData();
+        });
+
+        // Phone formatting
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+
+            if (value.startsWith('972')) {
+                value = value.substring(3);
+            }
+            if (value.startsWith('0')) {
+                value = value.substring(1);
+            }
+
+            if (value.length >= 9) {
+                if (value.startsWith('5')) {
+                    e.target.value = '05' + value.substring(1, 2) + '-' + value.substring(2, 5) + '-' + value.substring(5, 9);
+                } else {
+                    e.target.value = '0' + value.substring(0, 1) + '-' + value.substring(1, 4) + '-' + value.substring(4, 8);
+                }
+            } else {
+                e.target.value = value;
+            }
+            saveFormData();
+        });
+
+        // Email validation on blur
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !isValidEmail(email)) {
+                this.style.borderColor = '#ef4444';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+            } else {
+                this.style.borderColor = '#e1e5e9';
+                this.style.boxShadow = 'none';
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', saveFormData);
+        document.getElementById('location').addEventListener('change', saveFormData);
+    }
+
+    function handleOutsideClick(e) {
+        const searchInput = document.getElementById('positionSearch');
+        const searchResults = document.getElementById('searchResults');
+
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.add('hidden');
+        }
+    }
+
+    function handleKeyNavigation(event) {
+        if (event.key === 'Enter') {
+            if (currentStep === 1) {
+                nextStep(1);
+            } else if (currentStep === 2 && selectedPositions.length > 0) {
+                nextStep(2);
+            } else if (currentStep === 3 && document.getElementById('agreeTerms').checked) {
+                submitForm();
+            }
+        }
+    }
+
+    function searchPositions() {
+        const query = document.getElementById('positionSearch').value;
+        const resultsContainer = document.getElementById('searchResults');
+        const clearBtn = document.getElementById('clearSearch');
+
+        if (query.length > 0) {
+            clearBtn.classList.remove('hidden');
+        } else {
+            clearBtn.classList.add('hidden');
+        }
+
+        if (query.length < 2) {
+            resultsContainer.classList.add('hidden');
+            return;
+        }
+
+        const results = fuse.search(query);
+        displaySearchResults(results);
+    }
+
+    function clearSearch() {
+        document.getElementById('positionSearch').value = '';
+        document.getElementById('searchResults').classList.add('hidden');
+        document.getElementById('clearSearch').classList.add('hidden');
+    }
+
+    function displaySearchResults(results) {
+        const container = document.getElementById('searchResultsContainer');
+        const resultsDiv = document.getElementById('searchResults');
+
+        container.innerHTML = results.slice(0, 5).map(result => {
+            const escapedTitle = result.item.title.replace(/'/g, '\\\'');
+            const escapedCategory = result.item.category.replace(/'/g, '\\\'');
+            const escapedRelated = JSON.stringify(result.item.related).replace(/"/g, '&quot;');
+
+            return `<div class="search-result-item px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0" data-title="${escapedTitle}" data-category="${escapedCategory}" data-related="${escapedRelated}">
+                ${result.item.title}
+                <span class="text-xs text-gray-500 ml-2">(${result.item.category})</span>
+            </div>`;
+        }).join('');
+
+        // Add click listeners to search results
+        container.querySelectorAll('.search-result-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const title = this.getAttribute('data-title');
+                const category = this.getAttribute('data-category');
+                const related = JSON.parse(this.getAttribute('data-related').replace(/&quot;/g, '"'));
+                selectPosition(title, category, related);
+            });
+        });
+
+        resultsDiv.classList.remove('hidden');
+    }
+
+    function showCustomAlert(message, type = 'error') {
+        const alertElement = document.getElementById('form-alert');
+        if (!alertElement) return;
+
+        alertElement.textContent = message;
+        alertElement.className = `form-alert ${type}`; // Apply class for styling (e.g., 'error', 'success')
+        alertElement.style.display = 'block';
+
+        // Hide the message after a few seconds
+        setTimeout(() => {
+            alertElement.style.display = 'none';
+        }, 5000);
+    }
+
+    function selectPosition(title, category, related) {
+        if (selectedPositions.length >= 4) {
+            showCustomAlert('ניתן לבחור עד 4 משרות בלבד.');
+            document.getElementById('searchResults').classList.add('hidden');
+            document.getElementById('positionSearch').value = '';
+            return;
+        }
+
+        if (!selectedPositions.find(p => p.title === title)) {
+            selectedPositions.push({title, category});
+            updateSelectedPositions();
+            showRelatedPositions(related);
+            document.getElementById('searchResults').classList.add('hidden');
+            document.getElementById('positionSearch').value = '';
+            saveFormData();
+        }
+    }
+
+    function showRelatedPositions(related) {
+        const container = document.getElementById('relatedPositionsContainer');
+        const relatedDiv = document.getElementById('relatedPositions');
+
+        container.innerHTML = related.map(pos =>
+            `<div class="related-position job-tag px-4 py-2 rounded-lg text-sm font-medium cursor-pointer border-2 border-dashed border-blue-200 hover:border-solid hover:border-blue-400 transition-all" data-position="${pos}">
+                <span class="text-blue-600">💡</span> ${pos}
+            </div>`
+        ).join('');
+
+        // Add click listeners to related positions
+        container.querySelectorAll('.related-position').forEach(item => {
+            item.addEventListener('click', function() {
+                const positionTitle = this.getAttribute('data-position');
+                selectFromRelated(positionTitle);
+            });
+        });
+
+        relatedDiv.classList.remove('hidden');
+    }
+
+    function selectFromRelated(positionTitle) {
+        const position = allPositions.find(p => p.title === positionTitle);
+        if (position) {
+            selectPosition(position.title, position.category, position.related);
+        }
+    }
+
+    function updateSelectedPositions() {
+        const container = document.getElementById('selectedPositions');
+        const countElement = document.getElementById('selectedCount');
+        const reviewBtn = document.getElementById('reviewBtn');
+
+        countElement.textContent = `${selectedPositions.length}/4 selected`;
+
+        if (selectedPositions.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-sm">Select positions from above</p>';
+            reviewBtn.disabled = true;
+            reviewBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            container.innerHTML = selectedPositions.map(pos => `
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    ${pos.title}
+                    <button class="remove-position ml-2 text-blue-600 hover:text-blue-800" data-title="${pos.title}">×</button>
+                </span>
+            `).join('');
+
+            // Add click listeners to remove buttons
+            container.querySelectorAll('.remove-position').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const title = this.getAttribute('data-title');
+                    removePosition(title);
+                });
+            });
+
+            reviewBtn.disabled = false;
+            reviewBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    function removePosition(positionTitle) {
+        selectedPositions = selectedPositions.filter(p => p.title !== positionTitle);
+        updateSelectedPositions();
+        saveFormData();
+    }
+
+    function nextStep(step) {
+        if (step === 1) {
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const location = document.getElementById('location').value;
+
+            if (!name) {
+                showCustomAlert('אנא מלא את שמך המלא.');
                 return;
             }
 
-            try {
-                const cvData = JSON.parse(cvDataString);
-                const data = cvData.data || cvData; // Handle nested data structure
-
-                const fullNameInput = document.getElementById('fullName');
-                const emailInput = document.getElementById('email');
-                const phoneInput = document.getElementById('phone');
-                const locationSelect = document.getElementById('location');
-
-                if (data.name && fullNameInput) {
-                    fullNameInput.value = data.name.trim();
-                }
-                if (data.email && emailInput) {
-                    emailInput.value = data.email.trim();
-                }
-                if (data.phone && phoneInput) {
-                    phoneInput.value = data.phone.trim();
-                }
-                // We don't have location data from the CV parser, so we leave it for the user to select.
-
-            } catch (error) {
-                console.error('Failed to parse CV data from sessionStorage:', error);
+            if (!email) {
+                showCustomAlert('אנא מלא את כתובת האימייל שלך.');
+                return;
             }
-        });
-    </script>
-</body>
 
+            if (!isValidEmail(email)) {
+                showCustomAlert('אנא הזן כתובת אימייל חוקית.');
+                return;
+            }
+
+            if (!location) {
+                showCustomAlert('אנא בחר אזור מגורים.');
+                return;
+            }
+
+            // Move to step 2
+            document.getElementById('stepContent1').classList.add('hidden');
+            document.getElementById('stepContent2').classList.remove('hidden');
+
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.remove('inactive');
+            document.getElementById('step2').classList.add('active');
+
+            document.getElementById('progress1').style.width = '100%';
+            currentStep = 2;
+        }
+
+        if (step === 2) {
+            if (selectedPositions.length === 0) {
+                showCustomAlert('אנא בחר לפחות משרה אחת.');
+                return;
+            }
+
+            // Move to step 3
+            document.getElementById('stepContent2').classList.add('hidden');
+            document.getElementById('stepContent3').classList.remove('hidden');
+
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step2').classList.add('completed');
+            document.getElementById('step3').classList.remove('inactive');
+            document.getElementById('step3').classList.add('active');
+
+            document.getElementById('progress2').style.width = '100%';
+
+            updateReview();
+            currentStep = 3;
+        }
+    }
+
+    function prevStep(step) {
+        if (step === 2) {
+            document.getElementById('stepContent2').classList.add('hidden');
+            document.getElementById('stepContent1').classList.remove('hidden');
+
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step2').classList.add('inactive');
+            document.getElementById('step1').classList.remove('completed');
+            document.getElementById('step1').classList.add('active');
+
+            document.getElementById('progress1').style.width = '0%';
+            currentStep = 1;
+        }
+
+        if (step === 3) {
+            document.getElementById('stepContent3').classList.add('hidden');
+            document.getElementById('stepContent2').classList.remove('hidden');
+
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step3').classList.add('inactive');
+            document.getElementById('step2').classList.remove('completed');
+            document.getElementById('step2').classList.add('active');
+
+            document.getElementById('progress2').style.width = '0%';
+            currentStep = 2;
+        }
+    }
+
+    function updateReview() {
+        document.getElementById('reviewName').textContent = document.getElementById('fullName').value;
+        document.getElementById('reviewEmail').textContent = document.getElementById('email').value;
+        document.getElementById('reviewPhone').textContent = document.getElementById('phone').value || 'לא צוין';
+
+        const locationSelect = document.getElementById('location');
+        const locationText = locationSelect.options[locationSelect.selectedIndex].text;
+        document.getElementById('reviewLocation').textContent = locationText || 'לא צוין';
+
+        const positionsContainer = document.getElementById('reviewPositions');
+        positionsContainer.innerHTML = selectedPositions.map(pos => `
+            <p class="text-gray-700">• ${pos.title} <span class="text-sm text-gray-500">(${pos.category})</span></p>
+        `).join('');
+    }
+
+    function toggleSubmitButton() {
+        const agreeTerms = document.getElementById('agreeTerms').checked;
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (agreeTerms) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function submitForm() {
+        const loader = document.getElementById('loader');
+        const submitBtn = document.getElementById('submitBtn');
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'שולח...';
+            loader.classList.remove('hidden');
+
+            const formData = {
+                name: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim() || '',
+                location: document.getElementById('location').value,
+                positions: selectedPositions,
+                metadata: cvData.metadata || {},
+                source: 'verification_form'
+            };
+
+            console.log('Submitting form data:', formData);
+
+            // Replace with your actual API endpoint
+            const response = await fetch('/api/candidates/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': 'your-api-key-here' // Add your API key if required
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'השליחה נכשלה');
+            }
+
+            // Clear session data
+            clearSavedData();
+
+            // Hide loader and show success modal
+            loader.classList.add('hidden');
+            submitBtn.textContent = 'שלח פנייה';
+            document.getElementById('successModal').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Submit error:', error);
+            loader.classList.add('hidden');
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'שלח פנייה';
+
+            // Show error message inline
+            showCustomAlert(error.message || 'אירעה שגיאה בעת שליחת הפנייה. אנא נסה שוב.');
+        }
+    }
+
+    function goHome() {
+        window.location.href = '/';
+    }
+
+    // This function is no longer needed as the modal is removed.
+    // function closeErrorModal() { ... }
+
+    function saveFormData() {
+        const formData = {
+            name: document.getElementById('fullName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            location: document.getElementById('location').value,
+            selectedPositions: selectedPositions,
+            currentStep: currentStep
+        };
+        sessionStorage.setItem('formData', JSON.stringify(formData));
+    }
+
+    function loadFormData() {
+        const storedFormData = sessionStorage.getItem('formData');
+        if (storedFormData) {
+            try {
+                const formData = JSON.parse(storedFormData);
+
+                if (formData.name) document.getElementById('fullName').value = formData.name;
+                if (formData.email) document.getElementById('email').value = formData.email;
+                if (formData.phone) document.getElementById('phone').value = formData.phone;
+                if (formData.location) document.getElementById('location').value = formData.location;
+
+                if (formData.selectedPositions && Array.isArray(formData.selectedPositions)) {
+                    selectedPositions = formData.selectedPositions;
+                    updateSelectedPositions();
+                }
+            } catch (e) {
+                console.error('Error loading form data:', e);
+            }
+        }
+    }
+
+    function clearSavedData() {
+        sessionStorage.removeItem('formData');
+        sessionStorage.removeItem('cvData');
+    }
+
+    function populateFormData() {
+        console.log('Available cvData:', cvData);
+
+        if (!cvData) {
+            console.warn('No CV data found');
+            return;
+        }
+
+        // Handle both direct data and nested data structure
+        const data = cvData.data || cvData;
+
+        // Populate fields with extracted data
+        if (data.name && data.name.trim()) {
+            document.getElementById('fullName').value = data.name.trim();
+            console.log('Populated name:', data.name);
+        }
+
+        if (data.email && data.email.trim()) {
+            document.getElementById('email').value = data.email.trim().toLowerCase();
+            console.log('Populated email:', data.email);
+        }
+
+        if (data.phone && data.phone.trim()) {
+            document.getElementById('phone').value = data.phone.trim();
+            console.log('Populated phone:', data.phone);
+        }
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing verification form...');
+
+        // Load CV data from session storage FIRST
+        const storedData = sessionStorage.getItem('cvData');
+        console.log('Raw stored data:', storedData);
+
+        if (storedData) {
+            try {
+                cvData = JSON.parse(storedData);
+                console.log('Parsed CV data:', cvData);
+            } catch (e) {
+                console.error('Error parsing stored CV data:', e);
+                cvData = {};
+            }
+        } else {
+            console.warn('No CV data found in session storage');
+            cvData = {};
+        }
+
+        // Setup event listeners
+        setupEventListeners();
+
+        // THEN populate form data
+        setTimeout(() => {
+            populateFormData();
+            // Load any previously saved form data (this will override CV data if form was partially filled)
+            loadFormData();
+        }, 100);
+
+        console.log('Verification form initialized successfully');
+    });
+
+    // Handle browser back button
+    window.addEventListener('popstate', function(event) {
+        if (currentStep > 1) {
+            event.preventDefault();
+            if (currentStep === 2) {
+                prevStep(2);
+            } else if (currentStep === 3) {
+                prevStep(3);
+            }
+        }
+    });
+</script>
+</body>
 </html>
