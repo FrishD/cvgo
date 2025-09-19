@@ -214,13 +214,91 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFiles(files);
         });
 
-        function handleFiles(files) {
-            if (files.length) {
-                // For now, just log the file names and update the text
-                console.log('Files received:', files);
-                let fileNames = Array.from(files).map(f => f.name).join(', ');
-                dropZone.querySelector('p').textContent = `התקבלו הקבצים: ${fileNames}`;
+        async function handleFiles(files) {
+            if (files.length === 0) {
+                return;
             }
+
+            const file = files[0];
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const loader = document.querySelector('.loader-wrapper');
+
+            // Clear previous error messages
+            let errorElement = document.getElementById('upload-error');
+            if (errorElement) {
+                errorElement.remove();
+            }
+
+            // Validate file type
+            if (!allowedTypes.includes(file.type)) {
+                const typeError = 'רק קבצי PDF, DOC או DOCX מותרים.';
+                showUploadError(typeError);
+                fileInput.value = ''; // Clear the file input
+                return;
+            }
+
+            // Validate file size
+            if (file.size > maxSize) {
+                const sizeError = 'הגודל המקסימלי לקובץ הוא 5MB.';
+                showUploadError(sizeError);
+                fileInput.value = ''; // Clear the file input
+                return;
+            }
+
+            console.log('File is valid:', file.name);
+            dropZone.querySelector('p').textContent = `מעבד את הקובץ: ${file.name}...`;
+
+            // Show loader
+            if (loader) {
+                loader.classList.remove('hidden');
+            }
+
+            const formData = new FormData();
+            formData.append('cv', file);
+
+            try {
+                const response = await fetch('/api/candidates/parse-cv', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    sessionStorage.setItem('cvData', JSON.stringify(data));
+                    window.location.href = 'verify.html';
+                } else {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.message || 'אירעה שגיאה בעת העלאת הקובץ.';
+                    showUploadError(errorMessage);
+                    if (loader) {
+                       loader.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                showUploadError('שגיאת רשת. אנא נסה שוב.');
+                if (loader) {
+                    loader.classList.add('hidden');
+                }
+            }
+        }
+
+        function showUploadError(message) {
+            // Reset dropzone text
+            if(dropZone) {
+               dropZone.querySelector('p').textContent = 'גררו לכאן את קובץ קורות החיים או לחצו לבחירה';
+            }
+            // Show error message
+            let errorElement = document.getElementById('upload-error');
+            if (!errorElement) {
+                errorElement = document.createElement('p');
+                errorElement.id = 'upload-error';
+                errorElement.style.color = 'red';
+                errorElement.style.marginTop = '10px';
+                dropZone.parentNode.insertBefore(errorElement, dropZone.nextSibling);
+            }
+            errorElement.textContent = message;
         }
     }
 
