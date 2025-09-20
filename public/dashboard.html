@@ -1006,18 +1006,18 @@
         }
 
         .student-card {
-            background: rgba(118, 185, 255, 0.15);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.05); /* More neutral background */
+            backdrop-filter: blur(15px) saturate(150%); /* Reduced blur */
+            -webkit-backdrop-filter: blur(15px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Softer border */
             border-radius: var(--radius-ios-lg);
             padding: 20px;
-            display: flex; /* Use flexbox for better alignment */
-            justify-content: space-between;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            align-items: start;
             transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Softer shadow */
         }
 
         .student-card:hover {
