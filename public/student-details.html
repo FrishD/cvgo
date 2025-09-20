@@ -7,40 +7,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,500,700|Google+Symbols|Google+Sans+Text:400&amp;display=swap&amp;lang=en" rel="stylesheet" />
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --secondary: #64748b;
-            --success: #059669;
-            --error: #dc2626;
-            --warning: #d97706;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
-            --gray-500: #64748b;
-            --gray-600: #475569;
-            --gray-700: #334155;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
-            --border-radius: 12px;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            /* iOS Glass Colors */
+            --primary-dark: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-hover: rgba(255, 255, 255, 0.2);
+            --text-white: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-tertiary: rgba(255, 255, 255, 0.5);
+            --accent-blue: #007AFF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9500;
+            --accent-red: #FF453A;
+            --shadow-soft: rgba(0, 0, 0, 0.3);
+            --radius-ios: 16px;
+            --radius-ios-lg: 20px;
+            --radius-ios-xl: 28px;
         }
 
         body {
-            font-family: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--gray-50);
-            color: var(--gray-800);
+            font-family: 'Google Sans', 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000000;
+            color: var(--text-white);
             margin: 0;
-            padding: 24px;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: radial-gradient(circle,
+                rgba(0, 45, 100, 0.8) 0%,
+                rgba(0, 45, 100, 0.4) 70%,
+                rgba(0, 45, 100, 0.2) 100%);
+            filter: blur(100px);
+        }
+
+        .main-content {
+            padding: 24px;
         }
 
         .header {
@@ -48,25 +59,33 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .back-link {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: var(--gray-600);
+            color: var(--text-white);
             text-decoration: none;
             font-weight: 500;
-            background: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--gray-200);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 18px;
+            border-radius: var(--radius-ios);
+            border: 1px solid var(--glass-border);
             transition: all 0.2s ease;
         }
 
         .back-link:hover {
-            background: var(--gray-100);
-            border-color: var(--gray-300);
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .main-grid {
@@ -76,36 +95,35 @@
             align-items: start;
         }
 
-        .main-content {
+        .content-column, .sidebar-column {
             display: flex;
             flex-direction: column;
             gap: 24px;
         }
 
-        .sidebar {
+        .sidebar-column {
             position: sticky;
             top: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
         }
 
         .card {
-            background: white;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-sm);
+            background: rgba(118, 185, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-ios-xl);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
         .card-header {
             padding: 20px 24px;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .card-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--gray-900);
+            color: var(--text-white);
             margin: 0;
         }
 
@@ -113,157 +131,55 @@
             padding: 24px;
         }
 
-        .info-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-        }
-
-        .info-item + .info-item {
-            border-top: 1px solid var(--gray-100);
-        }
-
-        .info-label {
-            font-weight: 500;
-            color: var(--gray-600);
-        }
-
-        .info-value {
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-
-        .text-content {
-            line-height: 1.6;
-            color: var(--gray-700);
-        }
-
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-yes {
-            background: rgba(5, 150, 105, 0.1);
-            color: var(--success);
-        }
-
-        .status-no {
-            background: var(--gray-100);
-            color: var(--gray-600);
-        }
+        .info-list { list-style: none; padding: 0; margin: 0; }
+        .info-item { display: flex; justify-content: space-between; padding: 12px 0; }
+        .info-item + .info-item { border-top: 1px solid var(--glass-border); }
+        .info-label { font-weight: 500; color: var(--text-secondary); }
+        .info-value { font-weight: 600; color: var(--text-white); }
+        .text-content { line-height: 1.6; color: var(--text-secondary); }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .status-yes { background: rgba(48, 209, 88, 0.2); color: var(--accent-green); }
+        .status-no { background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); }
 
         .blurred-placeholder {
-            background: linear-gradient(90deg, var(--gray-200) 0%, var(--gray-300) 50%, var(--gray-200) 100%);
-            color: transparent;
-            user-select: none;
-            padding: 2px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            animation: shimmer 1.5s ease-in-out infinite;
-            min-width: 80px;
+            background: linear-gradient(90deg, var(--glass-border) 25%, var(--glass-hover) 50%, var(--glass-border) 75%);
+            color: transparent; user-select: none; padding: 2px 8px; border-radius: 4px; display: inline-block;
+            animation: shimmer 1.5s ease-in-out infinite; min-width: 80px;
         }
-
-        @keyframes shimmer {
-            0% { background-position: -200px 0; }
-            100% { background-position: 200px 0; }
-        }
-
-        .locked-content {
-            background: var(--gray-50);
-            border: 2px dashed var(--gray-300);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            color: var(--gray-600);
-        }
+        @keyframes shimmer { 0% { background-position: -200px 0; } 100% { background-position: 200px 0; } }
 
         .loading-state, .error-message {
-            text-align: center;
-            padding: 48px;
-            background: white;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--gray-200);
+            text-align: center; padding: 48px; background: rgba(118, 185, 255, 0.1);
+            border-radius: var(--radius-ios-xl); border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn {
-            background: var(--primary);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            position: relative;
+            background: var(--accent-blue); color: white; padding: 12px 24px; border: none;
+            border-radius: var(--radius-ios); font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease; width: 100%; position: relative;
         }
-
-        .btn:hover:not(:disabled) {
-            background: var(--primary-dark);
-        }
-
-        .btn:disabled {
-            background: var(--gray-300);
-            cursor: not-allowed;
-        }
-
-        .btn.loading {
-            color: transparent;
-        }
-
+        .btn:hover:not(:disabled) { background: #0056CC; }
+        .btn:disabled { background: var(--glass-border); cursor: not-allowed; }
+        .btn.loading { color: transparent; }
         .btn.loading::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 50%;
-            left: 50%;
-            margin-left: -8px;
-            margin-top: -8px;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s ease-in-out infinite;
+            content: ''; position: absolute; width: 16px; height: 16px; top: 50%; left: 50%;
+            margin-left: -8px; margin-top: -8px; border: 2px solid #ffffff;
+            border-radius: 50%; border-top-color: transparent; animation: spin 1s ease-in-out infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .file-download {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .file-download:hover {
-            text-decoration: underline;
-        }
+        .file-download { color: var(--accent-blue); text-decoration: none; font-weight: 500; }
+        .file-download:hover { text-decoration: underline; }
 
         @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                position: static;
-            }
+            .main-grid { grid-template-columns: 1fr; }
+            .sidebar-column { position: static; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="main-content">
     <div class="header">
         <a href="dashboard.html" class="back-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -273,28 +189,29 @@
         </a>
     </div>
 
-    <div id="student-details-content" class="loading-state">
-        טוען פרטי מועמד...
+    <div id="student-details-container" class="container">
+        <div class="loading-state">טוען פרטי מועמד...</div>
     </div>
 </div>
 
 <!-- File Preview Modal -->
 <div id="file-preview-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px);">
-    <div style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; height: 85%; border-radius: 12px; display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">
-            <h3 id="modal-title" style="font-size: 20px; font-weight: 600;">File Preview</h3>
-            <span id="close-modal" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    <div style="background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(20px); margin: 5% auto; padding: 20px; border: 1px solid var(--glass-border); width: 80%; height: 85%; border-radius: var(--radius-ios-xl); display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px; margin-bottom: 16px;">
+            <h3 id="modal-title" style="font-size: 20px; font-weight: 600; color: var(--text-white);">File Preview</h3>
+            <span id="close-modal" style="color: var(--text-tertiary); font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
         </div>
-        <iframe id="file-preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+        <iframe id="file-preview-iframe" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-ios);"></iframe>
     </div>
 </div>
 
 <script>
+    // All the same JS, but with the render function updated
     function getAvailabilityText(availability) {
         switch(availability) {
             case 'full_time': return 'משרה מלאה';
             case 'part_time': return 'משרה חלקית';
-            case 'flexible': return 'במיש';
+            case 'flexible': return 'גמיש';
             default: return 'לא צוין';
         }
     }
@@ -312,10 +229,7 @@
 
     function renderBlurredPlaceholder(originalText, hasAccess) {
         if (hasAccess) return originalText || 'לא צוין';
-
-        // Create realistic placeholder based on content type
-        const length = originalText ? Math.min(originalText.length, 50) : 20;
-        const placeholder = '*'.repeat(Math.max(length, 10));
+        const placeholder = '*'.repeat(Math.max((originalText || '').length, 10));
         return `<span class="blurred-placeholder" title="נדרשת חשיפה לצפייה בתוכן">${placeholder}</span>`;
     }
 
@@ -325,23 +239,11 @@
         return `<span class="status-badge ${className}">${text}</span>`;
     }
 
-    function renderBlurredPlaceholders(text) {
-        if (!text) return '';
-        // This regex finds the placeholder and wraps it in a span for the blur effect.
-        return text.replace(/\[REDACTED\]/g, '<span class="blurred-placeholder">[REDACTED]</span>');
-    }
-
-    // Modal handling logic
     function openPreviewModal(fileUrl, fileName) {
         const modal = document.getElementById('file-preview-modal');
         const modalTitle = document.getElementById('modal-title');
         const iframe = document.getElementById('file-preview-iframe');
-
-        if (!modal || !modalTitle || !iframe) {
-            console.error('Modal elements not found');
-            return;
-        }
-
+        if (!modal || !modalTitle || !iframe) return;
         modalTitle.textContent = `תצוגה מקדימה: ${fileName}`;
         iframe.src = fileUrl;
         modal.style.display = 'block';
@@ -350,44 +252,32 @@
     function closePreviewModal() {
         const modal = document.getElementById('file-preview-modal');
         const iframe = document.getElementById('file-preview-iframe');
-
         if (modal && iframe) {
             modal.style.display = 'none';
-            iframe.src = ''; // Stop loading content
+            iframe.src = '';
         }
     }
 
-    // Initialize modal event listeners once DOM is loaded
     function initializeModal() {
         const modal = document.getElementById('file-preview-modal');
         const closeModalBtn = document.getElementById('close-modal');
-
-        if (closeModalBtn) {
-            closeModalBtn.onclick = closePreviewModal;
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closePreviewModal();
-            }
-        }
+        if (closeModalBtn) closeModalBtn.onclick = closePreviewModal;
+        window.onclick = (event) => {
+            if (event.target == modal) closePreviewModal();
+        };
     }
 
     async function exposeStudent(studentId, token) {
         const btn = document.getElementById('expose-btn');
         if (!btn) return;
-
         btn.disabled = true;
         btn.classList.add('loading');
-
         try {
             const response = await fetch(`/api/user/expose/${studentId}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-
             const data = await response.json();
-
             if (response.ok) {
                 alert(`הפרטים נחשפו בהצלחה! נשארו לך ${data.remainingExposures} חשיפות.`);
                 window.location.reload();
@@ -395,7 +285,6 @@
                 alert(`שגיאה בחשיפת הפרטים: ${data.error}`);
             }
         } catch (error) {
-            console.error('Error exposing student:', error);
             alert('שגיאה בחשיפת הפרטים. אנא נסה שוב מאוחר יותר.');
         } finally {
             btn.disabled = false;
@@ -403,106 +292,70 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Initialize modal event listeners first
-        initializeModal();
-
-        const contentDiv = document.getElementById('student-details-content');
-        const params = new URLSearchParams(window.location.search);
-        const studentId = params.get('id');
-
-        if (!studentId) {
-            contentDiv.innerHTML = '<div class="error-message">שגיאה: לא סופק מזהה מועמד.</div>';
-            return;
-        }
-
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = '/';
-            return;
-        }
-
-        try {
-            const response = await fetch(`/api/students/admin/students/anonymized/${studentId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch student data.');
-            }
-
-            const data = await response.json();
-            const student = data.student;
-            const hasAccess = data.hasAccess;
-
-            if (!student) {
-                throw new Error('Student not found.');
-            }
-
-            document.title = `פרטי מועמד - ${student.id}`;
-
-            contentDiv.innerHTML = `
-                <div class="main-grid">
-                    <div class="main-content">
-                        <div class="card">
-                             <div class="card-header"><h2 class="card-title">פרטים אישיים</h2></div>
-                             <div class="card-content">
-                                <ul class="info-list">
-                                    <li class="info-item"><span class="info-label">שם</span><span class="info-value">${renderBlurredPlaceholder(student.name || 'שם מלא', hasAccess)}</span></li>
-                                    <li class="info-item"><span class="info-label">אימייל</span><span class="info-value">${renderBlurredPlaceholder(student.email || 'email@example.com', hasAccess)}</span></li>
-                                    <li class="info-item"><span class="info-label">טלפון</span><span class="info-value">${renderBlurredPlaceholder(student.phone || '05xxxxxxxx', hasAccess)}</span></li>
-                                    <li class="info-item"><span class="info-label">עיר</span><span class="info-value">${student.location?.city || 'לא צוין'}</span></li>
-                                </ul>
-                             </div>
-                        </div>
-                        <div class="card">
-                             <div class="card-header"><h2 class="card-title">השכלה</h2></div>
-                             <div class="card-content">
-                                <ul class="info-list">
-                                    <li class="info-item"><span class="info-label">מוסד</span><span class="info-value">${student.education?.institution || 'לא צוין'}</span></li>
-                                    <li class="info-item"><span class="info-label">תחום</span><span class="info-value">${student.education?.degreeField || 'לא צוין'}</span></li>
-                                    <li class="info-item"><span class="info-label">תואר</span><span class="info-value">${getDegreeText(student.education?.currentDegree)}</span></li>
-                                    <li class="info-item"><span class="info-label">שנה</span><span class="info-value">${student.education?.studyYear || 'לא צוין'}</span></li>
-                                    <li class="info-item"><span class="info-label">ממוצע</span><span class="info-value">${student.education?.gpa || 'לא צוין'}</span></li>
-                                </ul>
-                             </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><h2 class="card-title">הצהרה אישית</h2></div>
-                            <div class="card-content text-content">
-                                ${renderBlurredPlaceholders(student.personalStatement) || '<em>לא נמסר מידע.</em>'}
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><h2 class="card-title">מידע נוסף</h2></div>
-                            <div class="card-content text-content">
-                                ${renderBlurredPlaceholders(student.additionalInfo) || '<em>לא נמסר מידע.</em>'}
-                            </div>
+    function renderStudentDetails(student, hasAccess) {
+        const container = document.getElementById('student-details-container');
+        container.innerHTML = `
+            <div class="main-grid">
+                <div class="content-column">
+                    <div class="card">
+                         <div class="card-header"><h2 class="card-title">פרטים אישיים</h2></div>
+                         <div class="card-content">
+                            <ul class="info-list">
+                                <li class="info-item"><span class="info-label">שם</span><span class="info-value">${renderBlurredPlaceholder(student.name, hasAccess)}</span></li>
+                                <li class="info-item"><span class="info-label">אימייל</span><span class="info-value">${renderBlurredPlaceholder(student.email, hasAccess)}</span></li>
+                                <li class="info-item"><span class="info-label">טלפון</span><span class="info-value">${renderBlurredPlaceholder(student.phone, hasAccess)}</span></li>
+                                <li class="info-item"><span class="info-label">עיר</span><span class="info-value">${student.location?.city || 'לא צוין'}</span></li>
+                            </ul>
+                         </div>
+                    </div>
+                    <div class="card">
+                         <div class="card-header"><h2 class="card-title">השכלה</h2></div>
+                         <div class="card-content">
+                            <ul class="info-list">
+                                <li class="info-item"><span class="info-label">מוסד</span><span class="info-value">${student.education?.institution || 'לא צוין'}</span></li>
+                                <li class="info-item"><span class="info-label">תחום</span><span class="info-value">${student.education?.degreeField || 'לא צוין'}</span></li>
+                                <li class="info-item"><span class="info-label">תואר</span><span class="info-value">${getDegreeText(student.education?.currentDegree)}</span></li>
+                                <li class="info-item"><span class="info-label">שנה</span><span class="info-value">${student.education?.studyYear || 'לא צוין'}</span></li>
+                                <li class="info-item"><span class="info-label">ממוצע</span><span class="info-value">${student.education?.gpa || 'לא צוין'}</span></li>
+                            </ul>
+                         </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h2 class="card-title">הצהרה אישית</h2></div>
+                        <div class="card-content text-content">
+                            ${renderBlurredPlaceholder(student.personalStatement, hasAccess) || '<em>לא נמסר מידע.</em>'}
                         </div>
                     </div>
-                    <div class="sidebar">
-                        <div class="card">
-                            <div class="card-header"><h2 class="card-title">סטטוס</h2></div>
-                            <div class="card-content">
-                                <ul class="info-list">
-                                    <li class="info-item"><span class="info-label">מזהה</span><span class="info-value">${student.id}</span></li>
-                                    <li class="info-item"><span class="info-label">ניסיון</span><span class="info-value">${getStatusBadge(student.workExperience?.hasExperience)}</span></li>
-                                    <li class="info-item"><span class="info-label">זמינות</span><span class="info-value">${getAvailabilityText(student.availability?.hoursPerWeek)}</span></li>
-                                </ul>
-                            </div>
+                    <div class="card">
+                        <div class="card-header"><h2 class="card-title">מידע נוסף</h2></div>
+                        <div class="card-content text-content">
+                            ${renderBlurredPlaceholder(student.additionalInfo, hasAccess) || '<em>לא נמסר מידע.</em>'}
                         </div>
-                        <div class="card">
-                             <div class="card-header"><h2 class="card-title">קבצים</h2></div>
-                             <div class="card-content">
-                                ${hasAccess ? `
-                                    <ul class="info-list">
-                                        ${student.cvFile && student.cvFile.filename ? `<li class="info-item"><span class="info-label">קורות חיים</span><span class="info-value"><a href="#" class="file-download preview-link" data-url="/api/students/files/${student.cvFile.filename}" data-filename="${student.cvFile.originalFilename || student.cvFile.filename}">צפייה</a> | <a href="/api/students/files/${student.cvFile.filename}?disposition=download" class="file-download">הורדה</a></span></li>` : '<li class="info-item"><span class="info-label">קורות חיים</span><span class="info-value">לא הועלה</span></li>'}
-                                        ${student.education?.transcriptFile && student.education.transcriptFile.filename ? `<li class="info-item"><span class="info-label">גיליון ציונים</span><span class="info-value"><a href="#" class="file-download preview-link" data-url="/api/students/files/${student.education.transcriptFile.filename}" data-filename="${student.education.transcriptFile.originalFilename || student.education.transcriptFile.filename}">צפייה</a> | <a href="/api/students/files/${student.education.transcriptFile.filename}?disposition=download" class="file-download">הורדה</a></span></li>` : '<li class="info-item"><span class="info-label">גיליון ציונים</span><span class="info-value">לא הועלה</span></li>'}
-                                    </ul>` :
-                `<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 16px;">
+                    </div>
+                </div>
+                <div class="sidebar-column">
+                    <div class="card">
+                        <div class="card-header"><h2 class="card-title">סטטוס</h2></div>
+                        <div class="card-content">
+                            <ul class="info-list">
+                                <li class="info-item"><span class="info-label">מזהה</span><span class="info-value">${student.id}</span></li>
+                                <li class="info-item"><span class="info-label">ניסיון</span><span class="info-value">${getStatusBadge(student.workExperience?.hasExperience)}</span></li>
+                                <li class="info-item"><span class="info-label">זמינות</span><span class="info-value">${getAvailabilityText(student.availability?.hoursPerWeek)}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card">
+                         <div class="card-header"><h2 class="card-title">קבצים</h2></div>
+                         <div class="card-content">
+                            ${hasAccess ? `
+                                <ul class="info-list">
+                                    ${student.cvFile && student.cvFile.filename ? `<li class="info-item"><span class="info-label">קורות חיים</span><span class="info-value"><a href="#" class="file-download preview-link" data-url="/api/students/files/${student.cvFile.filename}" data-filename="${student.cvFile.originalFilename || student.cvFile.filename}">צפייה</a> | <a href="/api/students/files/${student.cvFile.filename}?disposition=download" class="file-download">הורדה</a></span></li>` : '<li class="info-item"><span class="info-label">קורות חיים</span><span class="info-value">לא הועלה</span></li>'}
+                                    ${student.education?.transcriptFile && student.education.transcriptFile.filename ? `<li class="info-item"><span class="info-label">גיליון ציונים</span><span class="info-value"><a href="#" class="file-download preview-link" data-url="/api/students/files/${student.education.transcriptFile.filename}" data-filename="${student.education.transcriptFile.originalFilename || student.education.transcriptFile.filename}">צפייה</a> | <a href="/api/students/files/${student.education.transcriptFile.filename}?disposition=download" class="file-download">הורדה</a></span></li>` : '<li class="info-item"><span class="info-label">גיליון ציונים</span><span class="info-value">לא הועלה</span></li>'}
+                                </ul>` :
+            `   <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: var(--radius-ios); padding: 24px; text-align: center; margin-bottom: 16px;">
                     <div style="font-size: 48px; margin-bottom: 16px; line-height: 1;">📄</div>
-                    <h4 style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">קבצי המועמד נעולים</h4>
-                    <p style="font-size: 14px; color: #64748b; margin-bottom: 0;">יש לחשוף את פרטי המועמד המלאים כדי לצפות בקורות החיים ובגיליון הציונים.</p>
+                    <h4 style="font-size: 18px; font-weight: 600; color: var(--text-white); margin-bottom: 8px;">קבצי המועמד נעולים</h4>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 0;">יש לחשוף את פרטי המועמד המלאים כדי לצפות בקורות החיים ובגיליון הציונים.</p>
                 </div>
                 <button id="expose-btn" class="btn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -511,32 +364,52 @@
                     </svg>
                     חשוף פרטים וקבצים
                 </button>`
-            }
-                             </div>
-                        </div>
+        }
+                         </div>
                     </div>
                 </div>
-            `;
-
-            const exposeBtn = document.getElementById('expose-btn');
-            if (exposeBtn) {
-                exposeBtn.addEventListener('click', () => exposeStudent(studentId, token));
-            }
-
-            // Add event listeners for preview links
-            const previewLinks = document.querySelectorAll('.preview-link');
-            previewLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const url = link.dataset.url;
-                    const filename = link.dataset.filename;
-                    openPreviewModal(url, filename);
-                });
+            </div>
+        `;
+        const exposeBtn = document.getElementById('expose-btn');
+        if (exposeBtn) {
+            exposeBtn.addEventListener('click', () => exposeStudent(student.id, localStorage.getItem('authToken')));
+        }
+        const previewLinks = document.querySelectorAll('.preview-link');
+        previewLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = link.dataset.url;
+                const filename = link.dataset.filename;
+                openPreviewModal(url, filename);
             });
+        });
+    }
 
+    document.addEventListener('DOMContentLoaded', async () => {
+        initializeModal();
+        const container = document.getElementById('student-details-container');
+        const params = new URLSearchParams(window.location.search);
+        const studentId = params.get('id');
+        if (!studentId) {
+            container.innerHTML = '<div class="error-message">שגיאה: לא סופק מזהה מועמד.</div>';
+            return;
+        }
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = '/';
+            return;
+        }
+        try {
+            const response = await fetch(`/api/students/admin/students/anonymized/${studentId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch student data.');
+            const data = await response.json();
+            if (!data.student) throw new Error('Student not found.');
+            renderStudentDetails(data.student, data.hasAccess);
         } catch (error) {
             console.error('Error fetching student details:', error);
-            contentDiv.innerHTML = '<div class="error-message">שגיאה בטעינת פרטי המועמד. אנא נסה שוב מאוחר יותר.</div>';
+            container.innerHTML = '<div class="error-message">שגיאה בטעינת פרטי המועמד. אנא נסה שוב מאוחר יותר.</div>';
         }
     });
 </script>

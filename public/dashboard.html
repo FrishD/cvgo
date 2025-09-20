@@ -86,44 +86,122 @@
             transition: all 0.3s ease;
         }
 
-        /* Loading Screen */
-        .loading-screen {
+        /* --- LOADER --- */
+        .loader-wrapper {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
             display: flex;
-            justify-content: center;
             align-items: center;
-            backdrop-filter: blur(20px);
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            font-family: "Inter", sans-serif;
+            font-size: 1.2em;
+            font-weight: 300;
+            color: white;
+            background-color: var(--primary-dark-blue, #1E3A8A); /* Fallback color */
+            user-select: none;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
         }
 
-        .loading-content {
-            text-align: center;
+        .loader-wrapper.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid var(--glass-border);
-            border-top: 3px solid var(--accent-blue);
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            aspect-ratio: 1 / 1;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 24px;
+            background-color: transparent;
+            animation: loader-rotate 4s linear infinite;
+            z-index: 0;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes loader-rotate {
+            0% {
+                transform: translate(-50%, -50%) rotate(90deg);
+                box-shadow:
+                        0 10px 20px 0 #fff inset,
+                        0 20px 30px 0 #ad5fff inset,
+                        0 60px 60px 0 #471eec inset;
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(270deg);
+                box-shadow:
+                        0 10px 20px 0 #fff inset,
+                        0 20px 10px 0 #d60a47 inset,
+                        0 40px 60px 0 #311e80 inset;
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(450deg);
+                box-shadow:
+                        0 10px 20px 0 #fff inset,
+                        0 20px 30px 0 #ad5fff inset,
+                        0 60px 60px 0 #471eec inset;
+            }
         }
 
-        .loading-text {
-            font-size: 16px;
-            color: var(--text-secondary);
-            font-weight: 500;
+        .loader-letter {
+            display: inline-block;
+            font-family: 'Google Sans', sans-serif;
+            opacity: 0.4;
+            transform: translateY(0);
+            animation: loader-letter-anim 4s infinite;
+            z-index: 1;
+            border-radius: 50ch;
+            border: none;
+        }
+
+        .loader-letter:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .loader-letter:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .loader-letter:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        .loader-letter:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        .loader-letter:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+        .loader-letter:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+        .loader-letter:nth-child(7) {
+            animation-delay: 0.6s;
+        }
+        .loader-letter:nth-child(8) {
+            animation-delay: 0.7s;
+        }
+        .loader-letter:nth-child(9) {
+            animation-delay: 0.8s;
+        }
+        .loader-letter:nth-child(10) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes loader-letter-anim {
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: translateY(0);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            40% {
+                opacity: 0.7;
+                transform: translateY(0);
+            }
         }
 
         /* Sidebar - Glass Effect */
@@ -607,14 +685,57 @@
             box-shadow: 0 12px 35px rgba(255, 69, 58, 0.45);
         }
 
+        .btn-tertiary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            box-shadow: none;
+            font-weight: 500;
+        }
+
+        .btn-tertiary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .logout-section .menu-item.logout {
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--accent-red);
+            font-weight: 600;
+            border-radius: var(--radius-ios);
+        }
+
+        .logout-section .menu-item.logout:hover {
+            background: rgba(255, 69, 58, 0.25);
+            color: #FF6159;
+        }
+
         /* Email Management */
-        .email-section, .regions-section, .gpa-range-filter, .filter-group {
+        .email-section, .regions-section, .gpa-range-filter {
             background: var(--glass-bg);
             border-radius: var(--radius-ios);
             padding: 24px;
             margin-bottom: 32px;
             border: 0.5px solid var(--glass-border);
             backdrop-filter: blur(20px);
+        }
+
+        .filter-group {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-ios);
+            padding: 16px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .filter-group:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
         }
 
         .email-header, .regions-header {
@@ -845,6 +966,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* Allow wrapping */
+            gap: 16px; /* Add some gap for wrapped items */
             margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 0.5px solid var(--glass-border);
@@ -905,10 +1028,10 @@
 
         .student-main-info {
             flex-grow: 1;
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns for better spacing */
             gap: 20px;
-            align-items: center;
+            align-items: start;
         }
 
         .student-card h3 {
@@ -1460,11 +1583,15 @@
 </head>
 <body>
 
-<div id="loading-screen" class="loading-screen">
-    <div class="loading-content">
-        <div class="spinner"></div>
-        <div class="loading-text">טוען נתוני משתמש...</div>
-    </div>
+<div id="loading-screen" class="loader-wrapper">
+    <span class="loader-letter">ט</span>
+    <span class="loader-letter">ו</span>
+    <span class="loader-letter">ע</span>
+    <span class="loader-letter">ן</span>
+    <span class="loader-letter">.</span>
+    <span class="loader-letter">.</span>
+    <span class="loader-letter">.</span>
+    <div class="loader"></div>
 </div>
 
 <div class="dashboard-container">
@@ -2373,7 +2500,9 @@
 
     function hideLoadingScreen() {
         const loader = document.getElementById('loading-screen');
-        if (loader) loader.style.display = 'none';
+        if (loader) {
+            loader.classList.add('hidden');
+        }
 
         const mainContent = document.querySelector('.dashboard-container');
         if (mainContent) {
@@ -2748,7 +2877,7 @@
                     </div>
                 </div>
                 <div class="student-actions">
-                    <a href="student-details.html?id=${student.id}" class="btn btn-small student-details-link">
+                    <a href="student-details.html?id=${student.id}" class="btn btn-small btn-tertiary student-details-link">
                         פרטים נוספים
                     </a>
                 </div>
